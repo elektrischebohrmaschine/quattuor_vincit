@@ -10,9 +10,9 @@ import java.io.IOException;
 public class ClientApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(fhtw.quattuor.client.ClientApplication.class.getResource("hello-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(fhtw.quattuor.client.ClientApplication.class.getResource("GUI_Struktur.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello!");
+        stage.setTitle("quattuor_vincit");
         stage.setScene(scene);
         stage.show();
     }
