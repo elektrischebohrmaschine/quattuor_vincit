@@ -11,7 +11,7 @@ public class ClientApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(fhtw.quattuor.client.ClientApplication.class.getResource("GUI_Struktur.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 600, 600);
+        Scene scene = new Scene(fxmlLoader.load(), 900, 900);
         stage.setTitle("quattuor_vincit");
         stage.setScene(scene);
         stage.show();

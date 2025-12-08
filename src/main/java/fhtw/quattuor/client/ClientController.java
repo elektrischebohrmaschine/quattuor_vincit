@@ -1,14 +1,39 @@
 package fhtw.quattuor.client;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 
 public class ClientController {
-    @FXML
-    private Label welcomeText;
+
+    private ClientConnectFourGrid connectFourGrid;
+
 
     @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
+    private PasswordField txt_password;
+    @FXML
+    private CheckBox check_synchronisation;
+    @FXML
+    private Text txt_player;
+    @FXML
+    private VBox boardContainer;
+    @FXML
+    private ColorPicker colorSelect;
+    @FXML
+    private Button btn_login;
+    @FXML
+    private ToggleButton btn_turn;
+    @FXML
+    private TextField txt_username;
+
+    @FXML
+    public void initialize() {
+
+        connectFourGrid = new ClientConnectFourGrid();
+
+        VBox gridNode = connectFourGrid.generateGrid();
+
+        boardContainer.getChildren().add(gridNode);
     }
 }
