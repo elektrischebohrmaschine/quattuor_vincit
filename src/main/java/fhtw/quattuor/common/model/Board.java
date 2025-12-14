@@ -3,6 +3,9 @@ package fhtw.quattuor.common.model;
 public class Board {
     private CellStatus[][] board;
 
+    public Board() {
+    }
+
     public Board(int size_x, int size_y) {
         this.board = new CellStatus[size_x][size_y];
         for (int i = 0; i < size_x; i++) {
@@ -34,5 +37,13 @@ public class Board {
 
     public void setCellStatus(int x, int y, CellStatus status) {
         board[x][y] = status;
+    }
+
+    public CellStatus[][] getBoard() {
+        return board;
+    }
+
+    public void setBoard(CellStatus[][] board) {
+        this.board = board;
     }
 }

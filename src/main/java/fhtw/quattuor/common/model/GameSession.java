@@ -2,10 +2,10 @@ package fhtw.quattuor.common.model;
 
 
 public class GameSession {
-    int row = 5;
-    int col = 5;
+    private final int row = 6;
+    private final int col = 7;
 
-    private int[][] board;
+    private Board board;
     private String opponent;
     private int sessionNumber;
     private boolean isFinished;
@@ -13,12 +13,12 @@ public class GameSession {
     private int moveCount;
 
     public GameSession() {
-        this.board = new int[row][col];
+        this.board = new Board(row, col);
     }
 
 
     public GameSession(String opponent, int sessionNumber, boolean yourTurn) {
-        this.board = new int[row][col];
+        this.board = new Board(row, col);
         this.opponent = opponent;
         this.sessionNumber = sessionNumber;
         this.yourTurn = yourTurn;
@@ -26,7 +26,7 @@ public class GameSession {
         this.moveCount = 0;
     }
 
-    public int[][] getBoard() {
+    public Board getBoard() {
         return board;
     }
 
@@ -62,7 +62,7 @@ public class GameSession {
         this.opponent = opponent;
     }
 
-    public void setBoard(int[][] board) {
+    public void setBoard(Board board) {
         this.board = board;
     }
 
