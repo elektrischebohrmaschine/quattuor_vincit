@@ -35,4 +35,12 @@ public class Board {
     public void setCellStatus(int x, int y, CellStatus status) {
         board[x][y] = status;
     }
+
+    public int getHeight(){
+        return board[0].length;
+    }
+
+    public int getWidth(){
+        return board.length;
+    }
 }
