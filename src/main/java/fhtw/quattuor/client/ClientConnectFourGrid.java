@@ -6,21 +6,21 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class ClientConnectFourGrid {
-    final private int GRID_WIDTH_X = 6;
-    final private int GRID_HEIGHT_Y = 7;
-    Button[][] buttonArray = new Button[GRID_WIDTH_X][GRID_HEIGHT_Y];
-    GameLogicSingle logic = new GameLogicSingle(GRID_WIDTH_X, GRID_HEIGHT_Y);
+    final private int GRID_HEIGHT_X = 6;
+    final private int GRID_WIDTH_Y = 7;
+    Button[][] buttonArray = new Button[GRID_HEIGHT_X][GRID_WIDTH_Y];
+    GameLogicSingle logic = new GameLogicSingle(GRID_HEIGHT_X, GRID_WIDTH_Y);
 
     final private int BTN_SIZE = 50;
     final private int BTN_SPACING = 2;
 
     public VBox generateGrid() {
         VBox outer = new VBox();
-        HBox[] hBoxArray = new HBox[GRID_WIDTH_X];
+        HBox[] hBoxArray = new HBox[GRID_HEIGHT_X];
 
-        for (int i = 0; i < GRID_WIDTH_X; i++) {
+        for (int i = 0; i < GRID_HEIGHT_X; i++) {
             hBoxArray[i] = new HBox();
-            for (int j = 0; j < GRID_HEIGHT_Y; j++) {
+            for (int j = 0; j < GRID_WIDTH_Y; j++) {
                 Button btn = new Button(" ");
                 btn.setPrefSize(BTN_SIZE, BTN_SIZE);
                 btn.setStyle("-fx-background-color: lightgray;");

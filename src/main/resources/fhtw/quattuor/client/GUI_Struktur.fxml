@@ -17,7 +17,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Text?>
 
-<HBox prefHeight="628.0" prefWidth="838.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fhtw.quattuor.client.ClientController">
+<HBox prefHeight="628.0" prefWidth="838.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fhtw.quattuor.client.ClientController">
    <children>
       <VBox prefHeight="618.0" prefWidth="334.0">
          <children>
@@ -83,6 +83,7 @@
                         </ToggleButton>
                     </items>
                   </ToolBar>
+                  <TextField alignment="CENTER" editable="false" promptText="WHO IS WINNING?" />
                </children>
             </VBox>
          </items>

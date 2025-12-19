@@ -12,7 +12,6 @@ public class GameLogicSingle {
         this.board = new Board(size_x, size_y);
     }
 
-
     public boolean valid_move(int x, int y) {
         boolean valid = false;
 
@@ -20,12 +19,11 @@ public class GameLogicSingle {
             return valid;
         }
 
-        if (x== board.getWidth()-1 ){
+        if (x== board.getHeight()-1 ){
             valid= true;
         } else if (board.getCellStatus(x+1, y) == CellStatus.EMPTY){
                 return false;
             }
-
 
             // Set Cell depending on current player
             if (player_one_turn) {
@@ -33,7 +31,12 @@ public class GameLogicSingle {
             } else {
                 board.setCellStatus(x, y, CellStatus.PLAYER2);
             }
-            //checkWinCondition(board);
+
+            if(checkWinCondition(board)== 1){
+                System.out.println("Winner winner Chicken Dinner: Player one won");
+            }else if (checkWinCondition(board)== 2){
+                System.out.println("Winner winner Chicken Dinner: Player two won");
+            } else if (checkWinCondition(board)== 0){}
             valid= true;
             toggle_player_turn();
 
@@ -50,23 +53,111 @@ public class GameLogicSingle {
         return player_one_turn;
     }
 
-//    public boolean checkWinCondition(Board board) {
-//        boolean win = false;
-//        int streak = 0;
-//
-//        for (int row = 0; row < board.getHeight(); row++) {
-//            for (int col = 0; col < board.getWidth(); col++) {
-//
-//                CellStatus status = board.getCellStatus(row, col);
-//
-//                if (streak == 4) {
-//                    win = true;
-//                    return win;
-//                }
-//            }
-//        }
-//        return win;
-//    }
+    public int  checkWinCondition(Board board) {
+        int player_one = 1;
+        int player_two = 2;
+        int none= 0;
 
+
+        // vertikal
+        for (int col = 0; col < board.getWidth(); col++) {
+            int streak_p1 = 0;
+            int streak_p2 = 0;
+            for (int row = 0; row < board.getHeight(); row++) {
+
+                CellStatus status = board.getCellStatus(row, col);
+
+                if (status == CellStatus.PLAYER1) {
+                    streak_p1++;
+                    streak_p2 = 0;
+                } else if (status == CellStatus.PLAYER2) {
+                    streak_p2++;
+                    streak_p1 = 0;
+                } else {
+                    streak_p1 = 0;
+                    streak_p2 = 0;
+                }
+
+                if (streak_p1 == 4) {
+                    return player_one;
+                }else if(streak_p2 == 4){
+                    return player_two;
+                }
+            }
+        }
+        // horizontal
+        for (int row = 0; row < board.getHeight(); row++) {
+            int streak_p1 = 0;
+            int streak_p2 = 0;
+            for (int col= 0; col < board.getWidth(); col++) {
+                CellStatus status = board.getCellStatus(row, col);
+
+                if (status == CellStatus.PLAYER1) {
+                    streak_p1++;
+                    streak_p2 = 0;
+                } else if (status == CellStatus.PLAYER2) {
+                    streak_p2++;
+                    streak_p1 = 0;
+                } else {
+                    streak_p1 = 0;
+                    streak_p2 = 0;
+                }
+
+                if (streak_p1 == 4) {
+                    return player_one;
+                }else if(streak_p2 == 4){
+                    return player_two;
+                }
+            }
+        }
+        // diagonal (links-> rechts)
+        for (int row = 0; row < board.getHeight() - 3; row++) {
+            for (int col = 0; col < board.getWidth() - 3; col++) {
+
+                int streak_p1 = 0;
+                int streak_p2 = 0;
+                for (int i = 0; i < 4; i++) {
+                    CellStatus status = board.getCellStatus(row + i, col + i);
+
+                    if (status == CellStatus.PLAYER1) {
+                        streak_p1++;
+                    } else if (status == CellStatus.PLAYER2) {
+                        streak_p2++;
+                    }
+                }
+
+                if (streak_p1 == 4){
+                    return player_one;
+                }else if(streak_p2 == 4){
+                    return player_two;
+                }
+            }
+        }
+
+        for (int row = 3; row < board.getHeight(); row++) {
+            for (int col = 0; col < board.getWidth()-3; col++) {
+
+                int streak_p1 = 0;
+                int streak_p2 = 0;
+
+                for (int i = 0; i < 4; i++) {
+                    CellStatus status = board.getCellStatus(row - i, col + i);
+
+                    if (status == CellStatus.PLAYER1) {
+                        streak_p1++;
+                    } else if (status == CellStatus.PLAYER2) {
+                        streak_p2++;
+                    }
+                }
+
+                if (streak_p1 == 4){
+                    return player_one;
+                }else if(streak_p2 == 4){
+                    return player_two;
+                }
+            }
+        }
+        return none;
+    }
 
 }

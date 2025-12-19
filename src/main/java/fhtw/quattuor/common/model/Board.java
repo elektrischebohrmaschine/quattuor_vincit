@@ -37,10 +37,10 @@ public class Board {
     }
 
     public int getHeight(){
-        return board[0].length;
+        return board.length;
     }
 
     public int getWidth(){
-        return board.length;
+        return board[0].length;
     }
 }
