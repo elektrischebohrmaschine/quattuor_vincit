@@ -83,7 +83,6 @@
                         </ToggleButton>
                     </items>
                   </ToolBar>
-                  <TextField fx:id="winner" alignment="CENTER" editable="false" promptText="WHO IS WINNING?" />
                </children>
             </VBox>
          </items>

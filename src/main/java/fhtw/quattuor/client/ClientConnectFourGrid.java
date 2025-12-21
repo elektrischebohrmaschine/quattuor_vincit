@@ -2,7 +2,9 @@ package fhtw.quattuor.client;
 
 import fhtw.quattuor.common.logic.GameLogicSingle;
 import fhtw.quattuor.common.model.Board;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -11,6 +13,7 @@ public class ClientConnectFourGrid {
     final private int GRID_WIDTH_Y = 7;
     Button[][] buttonArray = new Button[GRID_HEIGHT_X][GRID_WIDTH_Y];
     GameLogicSingle logic = new GameLogicSingle(GRID_HEIGHT_X, GRID_WIDTH_Y);
+    TextField showswinner = new TextField();
 
     final private int BTN_SIZE = 50;
     final private int BTN_SPACING = 2;
@@ -18,6 +21,8 @@ public class ClientConnectFourGrid {
     public VBox generateGrid() {
         VBox outer = new VBox();
         HBox[] hBoxArray = new HBox[GRID_HEIGHT_X];
+
+        outer.getChildren().add(showswinner);
 
         for (int i = 0; i < GRID_HEIGHT_X; i++) {
             hBoxArray[i] = new HBox();
@@ -33,6 +38,11 @@ public class ClientConnectFourGrid {
                 hBoxArray[i].getChildren().add(buttonArray[i][j]);
             }
             hBoxArray[i].setSpacing(BTN_SPACING);
+            hBoxArray[i].setAlignment(Pos.CENTER);
+            showswinner.setEditable(false);
+            showswinner.setPromptText("WHO IS WINNING??");
+            showswinner.setAlignment(Pos.CENTER);
+
             outer.getChildren().addAll(hBoxArray[i]);
         }
 
@@ -54,7 +64,7 @@ public class ClientConnectFourGrid {
 
        int winner= logic.getWinner();
         if(winner != 0) {
-            System.out.println("WINNER: " + winner);
+            showswinner.setText("WINNER: " + winner);
             disableButtons();
         }
     }
