@@ -1,7 +1,6 @@
 package fhtw.quattuor.client;
 
 import fhtw.quattuor.common.logic.GameLogicSingle;
-import fhtw.quattuor.common.model.Board;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -63,8 +62,11 @@ public class ClientConnectFourGrid {
         }
 
        int winner= logic.getWinner();
-        if(winner != 0) {
+        if(winner == 1 || winner == 2) {
             showswinner.setText("WINNER: " + winner);
+            disableButtons();
+        } else if (winner == 3) {
+            showswinner.setText("its a draw");
             disableButtons();
         }
     }

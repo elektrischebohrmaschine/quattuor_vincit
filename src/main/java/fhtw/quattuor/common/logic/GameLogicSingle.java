@@ -19,7 +19,6 @@ public class GameLogicSingle {
         }
 
         if (x== board.getHeight()-1 ){
-            valid= true;
         } else if (board.getCellStatus(x+1, y) == CellStatus.EMPTY){
                 return false;
             }
@@ -49,7 +48,8 @@ public class GameLogicSingle {
     public int checkWinCondition(Board board) {
         int player_one = 1;
         int player_two = 2;
-        int none= 0;
+        int draw = 3;
+        int continues= 0;
 
 
         // vertikal
@@ -78,6 +78,7 @@ public class GameLogicSingle {
                 }
             }
         }
+
         // horizontal
         for (int row = 0; row < board.getHeight(); row++) {
             int streak_p1 = 0;
@@ -103,6 +104,7 @@ public class GameLogicSingle {
                 }
             }
         }
+
         // diagonal (links-> rechts)
         for (int row = 0; row < board.getHeight() - 3; row++) {
             for (int col = 0; col < board.getWidth() - 3; col++) {
@@ -127,6 +129,7 @@ public class GameLogicSingle {
             }
         }
 
+        // diagonal (rechts -> links)
         for (int row = 3; row < board.getHeight(); row++) {
             for (int col = 0; col < board.getWidth()-3; col++) {
 
@@ -150,8 +153,19 @@ public class GameLogicSingle {
                 }
             }
         }
-        return none;
+
+        //draw
+        for (int row = 0; row < board.getHeight();) {
+            for (int col = 0; col < board.getWidth(); col++) {
+                if(board.getCellStatus(row, col) == CellStatus.EMPTY){
+                    return continues;
+                }
+            }
+            return draw;
+        }
+        return continues;
     }
+
     public int getWinner(){
         return checkWinCondition(board);
     }
