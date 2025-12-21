@@ -2,7 +2,6 @@ package fhtw.quattuor.common.logic;
 
 import fhtw.quattuor.common.model.Board;
 import fhtw.quattuor.common.model.CellStatus;
-import javafx.scene.control.Cell;
 
 public class GameLogicSingle {
     private boolean player_one_turn = true;
@@ -31,12 +30,6 @@ public class GameLogicSingle {
             } else {
                 board.setCellStatus(x, y, CellStatus.PLAYER2);
             }
-
-            if(checkWinCondition(board)== 1){
-                System.out.println("Winner winner Chicken Dinner: Player one won");
-            }else if (checkWinCondition(board)== 2){
-                System.out.println("Winner winner Chicken Dinner: Player two won");
-            } else if (checkWinCondition(board)== 0){}
             valid= true;
             toggle_player_turn();
 
@@ -53,7 +46,7 @@ public class GameLogicSingle {
         return player_one_turn;
     }
 
-    public int  checkWinCondition(Board board) {
+    public int checkWinCondition(Board board) {
         int player_one = 1;
         int player_two = 2;
         int none= 0;
@@ -159,5 +152,7 @@ public class GameLogicSingle {
         }
         return none;
     }
-
+    public int getWinner(){
+        return checkWinCondition(board);
+    }
 }

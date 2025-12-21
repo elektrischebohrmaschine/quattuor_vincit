@@ -1,14 +1,15 @@
 package fhtw.quattuor.client;
 
+import fhtw.quattuor.common.model.Board;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.control.TextField;
 
 public class ClientController {
 
     private ClientConnectFourGrid connectFourGrid;
-
 
     @FXML
     private PasswordField txt_password;

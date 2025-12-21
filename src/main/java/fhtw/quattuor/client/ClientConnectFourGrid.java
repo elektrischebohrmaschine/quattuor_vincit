@@ -1,6 +1,7 @@
 package fhtw.quattuor.client;
 
 import fhtw.quattuor.common.logic.GameLogicSingle;
+import fhtw.quattuor.common.model.Board;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -48,6 +49,20 @@ public class ClientConnectFourGrid {
                 buttonArray[row][col].setStyle("-fx-background-color: red;");
             } else {
                 buttonArray[row][col].setStyle("-fx-background-color: yellow;");
+            }
+        }
+
+       int winner= logic.getWinner();
+        if(winner != 0) {
+            System.out.println("WINNER: " + winner);
+            disableButtons();
+        }
+    }
+
+    public void disableButtons() {
+        for (Button[] row: buttonArray) {
+            for (Button button: row) {
+                button.setDisable(true);
             }
         }
     }
