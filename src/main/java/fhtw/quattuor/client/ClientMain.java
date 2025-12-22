@@ -1,5 +1,8 @@
 package fhtw.quattuor.client;
 
+import fhtw.quattuor.common.net.NetMessage;
+import fhtw.quattuor.common.serialization.NetMessageSerializer;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,6 +35,8 @@ public class ClientMain {
                 }
             });
 
+            NetMessageSerializer msgSer = new NetMessageSerializer();
+
             readerThread.setDaemon(true);
 
             readerThread.start();
@@ -39,14 +44,44 @@ public class ClientMain {
             Scanner input = new Scanner(System.in);
             System.out.print("Enter your msg: (/quit to end)");
 
-            while(true){
+            while (true) {
                 String msg = input.nextLine();
 
-                if(msg.equalsIgnoreCase("/quit")){
+                if (msg.equalsIgnoreCase("/quit")) {
                     break;
                 }
+
+                if (msg.startsWith("login ")) {
+                    String[] parts = msg.split(" ", 3);
+                    if (parts.length < 3) {
+                        System.out.println("Usage: login <user> <pass>");
+                        continue;
+                    }
+
+                    NetMessage m = new NetMessage("LOGIN");
+                    m.setUsername(parts[1]);
+                    m.setPassword(parts[2]);
+                    out.println(msgSer.toJson(m));
+                    continue;
+                }
+
+                if (msg.startsWith("register ")) {
+                    String[] parts = msg.split(" ", 3);
+                    if (parts.length < 3) {
+                        System.out.println("Usage: register <user> <pass>");
+                        continue;
+                    }
+
+                    NetMessage m = new NetMessage("REGISTER");
+                    m.setUsername(parts[1]);
+                    m.setPassword(parts[2]);
+                    out.println(msgSer.toJson(m));
+                    continue;
+                }
+
                 out.println(msg);
             }
+
             socket.close();
             System.out.println("Connection closed.");
         }catch(IOException e){

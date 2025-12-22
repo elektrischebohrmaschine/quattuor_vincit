@@ -3,6 +3,8 @@ package fhtw.quattuor.server;
 
 
 import fhtw.quattuor.common.model.Player;
+import fhtw.quattuor.common.net.NetMessage;
+import fhtw.quattuor.common.serialization.NetMessageSerializer;
 import fhtw.quattuor.common.serialization.PlayerSerializer;
 
 import java.io.*;
@@ -67,6 +69,11 @@ public class ServerMain {
         private BufferedReader in;
         private PrintWriter out;
 
+        private final NetMessageSerializer msgSer = new NetMessageSerializer();
+        private final PlayerSerializer playerSer = new PlayerSerializer();
+
+        private Player loggedInPlayer = null;
+
         public ClientHandler(Socket clientSocket, ServerMain server) {
             this.clientSocket = clientSocket;
             this.server = server;
@@ -85,35 +92,111 @@ public class ServerMain {
 
         @Override
         public void run() {
-            try{
+            try {
                 out.println("Welcome to Quattuor Vincit!");
+                out.println("Please LOGIN or REGISTER (JSON).");
 
                 String input;
-
-                while((input = in.readLine()) != null) {
+                while ((input = in.readLine()) != null) {
                     System.out.println("Empfangen von: " + clientSocket.getInetAddress() + ": " + input);
 
-                    //Game Logic
-                    if(input.startsWith("{")){
-                        // Catch JSON and interpret it
-                        PlayerSerializer playerSerializer = new PlayerSerializer();
-                        Player player = playerSerializer.deserializePlayer(input);
-                        playerService.registerOrUpdate(player);
-                        playerService.safePlayersToDisk();
-                    }
+                    if (input.startsWith("{")) {
+                        NetMessage msg = msgSer.fromJson(input);
 
-                    server.broadcast(input, this);
+                        if (msg == null || msg.getType() == null) {
+                            sendError("BAD_REQUEST", "Unknown JSON format");
+                            continue;
+                        }
+
+                        switch (msg.getType()) {
+                            case "LOGIN" -> handleLogin(msg);
+                            case "REGISTER" -> handleRegister(msg);
+
+                            case "PLAYER_UPDATE" -> handlePlayerUpdate(msg);
+
+                            default -> sendError("UNKNOWN_TYPE", "Unknown message type: " + msg.getType());
+                        }
+
+                    } else {
+                        if (loggedInPlayer == null) {
+                            out.println(">> Please LOGIN first.");
+                            continue;
+                        }
+                        server.broadcast(input, this);
+                    }
                 }
-            }catch(IOException e) {
+            } catch (IOException e) {
                 System.out.println("Client disconnected: " + clientSocket.getInetAddress());
-            }finally {
+            } finally {
                 server.removeClients(this);
-                try{
-                    clientSocket.close();
-                }catch(IOException e) {
-                    e.printStackTrace();
-                }
+                try { clientSocket.close(); } catch (IOException ignored) {}
             }
+        }
+
+        private void handleLogin(NetMessage msg) {
+            Player p = playerService.authenticate(msg.getUsername(), msg.getPassword());
+            if (p == null) {
+                NetMessage res = new NetMessage("LOGIN_FAIL");
+                res.setError("Wrong username or password");
+                out.println(msgSer.toJson(res));
+                return;
+            }
+
+            loggedInPlayer = p;
+
+            NetMessage res = new NetMessage("LOGIN_OK");
+            // optional: gleich Player zurückgeben
+            res.setPayload(playerSer.serializePlayer(p));
+            out.println(msgSer.toJson(res));
+        }
+
+        private void handleRegister(NetMessage msg) {
+            boolean ok = playerService.register(msg.getUsername(), msg.getPassword());
+            if (!ok) {
+                NetMessage res = new NetMessage("REGISTER_FAIL");
+                res.setError("Username exists or invalid input");
+                out.println(msgSer.toJson(res));
+                return;
+            }
+
+            playerService.safePlayersToDisk();
+
+            NetMessage res = new NetMessage("REGISTER_OK");
+            out.println(msgSer.toJson(res));
+        }
+
+        private void handlePlayerUpdate(NetMessage msg) {
+            if (loggedInPlayer == null) {
+                sendError("NOT_LOGGED_IN", "Please LOGIN first");
+                return;
+            }
+            if (msg.getPayload() == null || msg.getPayload().isBlank()) {
+                sendError("BAD_REQUEST", "payload missing");
+                return;
+            }
+
+            Player updated = playerSer.deserializePlayer(msg.getPayload());
+            if (updated == null) {
+                sendError("BAD_REQUEST", "payload not a Player json");
+                return;
+            }
+
+            if (!loggedInPlayer.getUsername().equals(updated.getUsername())) {
+                sendError("FORBIDDEN", "You can only update your own player");
+                return;
+            }
+
+            playerService.registerOrUpdate(updated);
+            playerService.safePlayersToDisk();
+
+            NetMessage res = new NetMessage("PLAYER_UPDATE_OK");
+            out.println(msgSer.toJson(res));
+        }
+
+        private void sendError(String code, String text) {
+            NetMessage res = new NetMessage(code);
+            res.setError(text);
+            out.println(msgSer.toJson(res));
         }
     }
 }
