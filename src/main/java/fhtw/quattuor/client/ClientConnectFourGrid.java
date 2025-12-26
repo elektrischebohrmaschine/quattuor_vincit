@@ -1,6 +1,8 @@
 package fhtw.quattuor.client;
 
 import fhtw.quattuor.common.logic.GameLogicSingle;
+import fhtw.quattuor.common.logic.SingleLevels;
+import fhtw.quattuor.common.model.CellStatus;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -10,9 +12,10 @@ import javafx.scene.layout.VBox;
 public class ClientConnectFourGrid {
     final private int GRID_HEIGHT_X = 6;
     final private int GRID_WIDTH_Y = 7;
+
     Button[][] buttonArray = new Button[GRID_HEIGHT_X][GRID_WIDTH_Y];
     GameLogicSingle logic = new GameLogicSingle(GRID_HEIGHT_X, GRID_WIDTH_Y);
-    TextField showswinner = new TextField();
+    TextField showsWinner = new TextField();
 
     final private int BTN_SIZE = 50;
     final private int BTN_SPACING = 2;
@@ -21,7 +24,7 @@ public class ClientConnectFourGrid {
         VBox outer = new VBox();
         HBox[] hBoxArray = new HBox[GRID_HEIGHT_X];
 
-        outer.getChildren().add(showswinner);
+        outer.getChildren().add(showsWinner);
 
         for (int i = 0; i < GRID_HEIGHT_X; i++) {
             hBoxArray[i] = new HBox();
@@ -38,9 +41,9 @@ public class ClientConnectFourGrid {
             }
             hBoxArray[i].setSpacing(BTN_SPACING);
             hBoxArray[i].setAlignment(Pos.CENTER);
-            showswinner.setEditable(false);
-            showswinner.setPromptText("WHO IS WINNING??");
-            showswinner.setAlignment(Pos.CENTER);
+            showsWinner.setEditable(false);
+            showsWinner.setPromptText("WHO IS WINNING??");
+            showsWinner.setAlignment(Pos.CENTER);
 
             outer.getChildren().addAll(hBoxArray[i]);
         }
@@ -61,13 +64,23 @@ public class ClientConnectFourGrid {
             }
         }
 
-       int winner= logic.getWinner();
-        if(winner == 1 || winner == 2) {
-            showswinner.setText("WINNER: " + winner);
-            disableButtons();
-        } else if (winner == 3) {
-            showswinner.setText("its a draw");
-            disableButtons();
+        int winner = logic.getWinner();
+        if(logic.getLevelMode()){
+            if(winner== 1){
+                showsWinner.setText("Yaaay you won");
+                disableButtons();
+            } else {
+                showsWinner.setText("Yaaay you lost");
+                disableButtons();
+            }
+        }else {
+            if (winner == 1 || winner == 2) {
+                showsWinner.setText("WINNER: " + winner);
+                disableButtons();
+            } else if (winner == 3) {
+                showsWinner.setText("its a draw");
+                disableButtons();
+            }
         }
     }
 
@@ -75,6 +88,37 @@ public class ClientConnectFourGrid {
         for (Button[] row: buttonArray) {
             for (Button button: row) {
                 button.setDisable(true);
+            }
+        }
+    }
+
+    public void startLevel(int level){
+
+        SingleLevels lvl;
+
+        switch(level){
+            case 1: lvl = SingleLevels.Level1(logic.getBoard());
+                break;
+            case 2: lvl = SingleLevels.Level2(logic.getBoard());
+                break;
+            case 3: lvl = SingleLevels.Level3(logic.getBoard());
+                break;
+            default:
+                return;
+        }
+
+        logic.LevelLaden(lvl);
+
+        for (int row = 0; row < buttonArray.length; row++) {
+            for (int col = 0; col < buttonArray[0].length; col++) {
+                CellStatus status= logic.getBoard().getCellStatus(row, col);
+                if (status == CellStatus.PLAYER1) {
+                    buttonArray[row][col].setStyle("-fx-background-color: yellow;");
+                } else if (status == CellStatus.PLAYER2) {
+                    buttonArray[row][col].setStyle("-fx-background-color: red;");
+                }else {
+                    buttonArray[row][col].setStyle("-fx-background-color: lightgray;");
+                }
             }
         }
     }

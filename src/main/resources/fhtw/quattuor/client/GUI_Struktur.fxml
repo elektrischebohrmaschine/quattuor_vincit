@@ -5,7 +5,9 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.SplitMenuButton?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -60,27 +62,34 @@
             </TabPane>
          </children>
       </VBox>
-      <SplitPane prefHeight="609.0" prefWidth="588.0" HBox.hgrow="ALWAYS">
+      <SplitPane prefHeight="618.0" prefWidth="622.0" HBox.hgrow="ALWAYS">
          <HBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </HBox.margin>
          <items>
-            <VBox fx:id="boardContainer" prefHeight="617.0" prefWidth="582.0">
+            <VBox fx:id="boardContainer" prefHeight="617.0" prefWidth="558.0">
                <children>
                   <ToolBar prefHeight="40.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                     <items>
                         <Text fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Oponment: " />
                         <Text fx:id="txt_player" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="insert username? " />
-                        <ColorPicker fx:id="colorSelect" editable="true" promptText="ze color u chose">
+                        <ColorPicker fx:id="colorSelect" editable="true" prefHeight="26.0" prefWidth="113.0" promptText="ze color u chose">
                            <value>
                               <Color red="0.31578946113586426" green="0.09473684430122375" blue="0.09473684430122375" />
                            </value>
                         </ColorPicker>
-                        <ToggleButton fx:id="btn_turn" mnemonicParsing="false" prefHeight="26.0" prefWidth="139.0" text="your turn" textAlignment="CENTER">
+                        <ToggleButton fx:id="btn_turn" mnemonicParsing="false" prefHeight="26.0" prefWidth="94.0" text="your turn" textAlignment="CENTER">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
                         </ToggleButton>
+                        <SplitMenuButton fx:id="splitLevels" mnemonicParsing="false" prefHeight="26.0" prefWidth="135.0" text="Levels" textAlignment="CENTER">
+                          <items>
+                            <MenuItem fx:id="level1" mnemonicParsing="false" text="Level 1" />
+                              <MenuItem fx:id="level2" mnemonicParsing="false" text="Level 2" />
+                              <MenuItem fx:id="level3" mnemonicParsing="false" text="Level 3" />
+                          </items>
+                        </SplitMenuButton>
                     </items>
                   </ToolBar>
                </children>

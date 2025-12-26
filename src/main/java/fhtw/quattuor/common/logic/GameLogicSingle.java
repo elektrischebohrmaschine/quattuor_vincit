@@ -5,6 +5,7 @@ import fhtw.quattuor.common.model.CellStatus;
 
 public class GameLogicSingle {
     private boolean player_one_turn = true;
+    private boolean LevelMode= false;
     private Board board;
 
     public GameLogicSingle(int size_x, int size_y) {
@@ -20,17 +21,18 @@ public class GameLogicSingle {
 
         if (x== board.getHeight()-1 ){
         } else if (board.getCellStatus(x+1, y) == CellStatus.EMPTY){
-                return false;
-            }
+            return valid;
+        }
 
-            // Set Cell depending on current player
-            if (player_one_turn) {
-                board.setCellStatus(x, y, CellStatus.PLAYER1);
+        // Set Cell depending on current player
+        if (player_one_turn) {
+            board.setCellStatus(x, y, CellStatus.PLAYER1);
             } else {
                 board.setCellStatus(x, y, CellStatus.PLAYER2);
             }
-            valid= true;
-            toggle_player_turn();
+        toggle_player_turn();
+
+        valid= true;
 
         // DEBUG - Remove later :)
         board.print_board();
@@ -168,5 +170,17 @@ public class GameLogicSingle {
 
     public int getWinner(){
         return checkWinCondition(board);
+    }
+
+    public void LevelLaden (SingleLevels level){
+        this.board = level.board;
+    }
+
+    public Board getBoard() {
+        return this.board;
+    }
+
+    public boolean getLevelMode() {
+       return LevelMode;
     }
 }
