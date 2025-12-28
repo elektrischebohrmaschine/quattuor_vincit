@@ -1,7 +1,7 @@
 package fhtw.quattuor.common.net;
 
 public class NetMessage {
-    private String type;
+    private NetType type;
     private String username;
     private String password;
     private String payload;
@@ -10,14 +10,14 @@ public class NetMessage {
     public NetMessage() {
     }
 
-    public NetMessage(String type) {
+    public NetMessage(NetType type) {
         this.type = type;
     }
 
-    public String getType() {
+    public NetType getType() {
         return type;
     }
-    public void setType(String type) {
+    public void setType(NetType type) {
         this.type = type;
     }
 

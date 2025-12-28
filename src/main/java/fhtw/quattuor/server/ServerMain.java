@@ -4,6 +4,7 @@ package fhtw.quattuor.server;
 
 import fhtw.quattuor.common.model.Player;
 import fhtw.quattuor.common.net.NetMessage;
+import fhtw.quattuor.common.net.NetType;
 import fhtw.quattuor.common.serialization.NetMessageSerializer;
 import fhtw.quattuor.common.serialization.PlayerSerializer;
 
@@ -63,7 +64,7 @@ public class ServerMain {
 
     //Testing end
 
-    private static class ClientHandler implements Runnable {
+    private class ClientHandler implements Runnable {
         private final Socket clientSocket;
         private final ServerMain server;
         private BufferedReader in;
@@ -104,22 +105,30 @@ public class ServerMain {
                         NetMessage msg = msgSer.fromJson(input);
 
                         if (msg == null || msg.getType() == null) {
-                            sendError("BAD_REQUEST", "Unknown JSON format");
+                            sendError(NetType.ERROR, "Unknown JSON format");
                             continue;
                         }
 
                         switch (msg.getType()) {
-                            case "LOGIN" -> handleLogin(msg);
-                            case "REGISTER" -> handleRegister(msg);
-
-                            case "PLAYER_UPDATE" -> handlePlayerUpdate(msg);
-
-                            default -> sendError("UNKNOWN_TYPE", "Unknown message type: " + msg.getType());
+                            case NetType.LOGIN:
+                                handleLogin(msg);
+                                break;
+                            case NetType.REGISTER:
+                                handleRegister(msg);
+                                break;
+                            case NetType.PLAYER_UPDATE:
+                                handlePlayerUpdate(msg);
+                                break;
+                            case NetType.LOGOUT:
+                                handleLogout();
+                                break;
+                            default:
+                                sendError(NetType.ERROR, "Unknown message type: " + msg.getType());
                         }
 
                     } else {
                         if (loggedInPlayer == null) {
-                            out.println(">> Please LOGIN first.");
+                            out.println("Please LOGIN first.");
                             continue;
                         }
                         server.broadcast(input, this);
@@ -133,10 +142,16 @@ public class ServerMain {
             }
         }
 
+        private void handleLogout() {
+            loggedInPlayer = null;
+            NetMessage res = new NetMessage(NetType.LOGOUT_SUCCESS);
+            out.println(msgSer.toJson(res));
+        }
+
         private void handleLogin(NetMessage msg) {
             Player p = playerService.authenticate(msg.getUsername(), msg.getPassword());
             if (p == null) {
-                NetMessage res = new NetMessage("LOGIN_FAIL");
+                NetMessage res = new NetMessage(NetType.LOGIN_FAIL);
                 res.setError("Wrong username or password");
                 out.println(msgSer.toJson(res));
                 return;
@@ -144,7 +159,9 @@ public class ServerMain {
 
             loggedInPlayer = p;
 
-            NetMessage res = new NetMessage("LOGIN_OK");
+            NetMessage res = new NetMessage(NetType.LOGIN_SUCCESS);
+            res.setUsername(p.getUsername());
+            res.setPassword(p.getPassword());
             // optional: gleich Player zurückgeben
             res.setPayload(playerSer.serializePlayer(p));
             out.println(msgSer.toJson(res));
@@ -153,7 +170,7 @@ public class ServerMain {
         private void handleRegister(NetMessage msg) {
             boolean ok = playerService.register(msg.getUsername(), msg.getPassword());
             if (!ok) {
-                NetMessage res = new NetMessage("REGISTER_FAIL");
+                NetMessage res = new NetMessage(NetType.REGISTER_FAIL);
                 res.setError("Username exists or invalid input");
                 out.println(msgSer.toJson(res));
                 return;
@@ -161,39 +178,43 @@ public class ServerMain {
 
             playerService.safePlayersToDisk();
 
-            NetMessage res = new NetMessage("REGISTER_OK");
+            NetMessage res = new NetMessage(NetType.REGISTER_SUCCESS);
+            res.setUsername(msg.getUsername());
+            res.setPassword(msg.getPassword());
             out.println(msgSer.toJson(res));
         }
 
         private void handlePlayerUpdate(NetMessage msg) {
             if (loggedInPlayer == null) {
-                sendError("NOT_LOGGED_IN", "Please LOGIN first");
+                sendError(NetType.NOT_LOGGED_IN, "Please LOGIN first");
                 return;
             }
             if (msg.getPayload() == null || msg.getPayload().isBlank()) {
-                sendError("BAD_REQUEST", "payload missing");
+                sendError(NetType.ERROR, "payload missing");
                 return;
             }
 
             Player updated = playerSer.deserializePlayer(msg.getPayload());
             if (updated == null) {
-                sendError("BAD_REQUEST", "payload not a Player json");
+                sendError(NetType.ERROR, "payload not a Player json");
                 return;
             }
 
             if (!loggedInPlayer.getUsername().equals(updated.getUsername())) {
-                sendError("FORBIDDEN", "You can only update your own player");
+                sendError(NetType.FORBIDDEN, "You can only update your own player");
                 return;
             }
 
             playerService.registerOrUpdate(updated);
             playerService.safePlayersToDisk();
 
-            NetMessage res = new NetMessage("PLAYER_UPDATE_OK");
+            NetMessage res = new NetMessage(NetType.PLAYER_UPDATE_SUCCESS);
+            res.setUsername(updated.getUsername());
+            res.setPassword(updated.getPassword());
             out.println(msgSer.toJson(res));
         }
 
-        private void sendError(String code, String text) {
+        private void sendError(NetType code, String text) {
             NetMessage res = new NetMessage(code);
             res.setError(text);
             out.println(msgSer.toJson(res));

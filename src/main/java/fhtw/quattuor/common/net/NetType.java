@@ -1,0 +1,18 @@
+package fhtw.quattuor.common.net;
+
+public enum NetType {
+    LOGIN,
+    LOGIN_FAIL,
+    LOGIN_SUCCESS,
+    LOGOUT,
+    LOGOUT_SUCCESS,
+    REGISTER,
+    REGISTER_FAIL,
+    REGISTER_SUCCESS,
+    PLAYER_UPDATE,
+    PLAYER_UPDATE_FAIL,
+    PLAYER_UPDATE_SUCCESS,
+    NOT_LOGGED_IN,
+    FORBIDDEN,
+    ERROR
+}
