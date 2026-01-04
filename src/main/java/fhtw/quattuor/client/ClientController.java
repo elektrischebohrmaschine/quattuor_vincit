@@ -93,7 +93,7 @@ public class ClientController {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Login failed");
             alert.setHeaderText("Username unknown");
-            alert.setContentText("Would you like to register it instead?\nUsing the following password: " + txt_password.getText());
+            alert.setContentText("Would you like to register it instead?\nUsing the following:\nUsername: " + txt_username.getText() + "\n Password: " + txt_password.getText());
 
             Optional<ButtonType> result = alert.showAndWait();
 
