@@ -46,7 +46,7 @@ public class ClientTCP {
 
     public void textClientTCPConnection() {
 
-        try{
+        try {
             Socket socket = new Socket(host, port);
             System.out.println("Connected to " + host + ":" + port);
 
@@ -54,12 +54,12 @@ public class ClientTCP {
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
             Thread readerThread = new Thread(() -> {
-                try{
+                try {
                     String line;
-                    while((line = in.readLine()) != null){
+                    while ((line = in.readLine()) != null) {
                         System.out.println(">> " + line);
                     }
-                }catch(Exception e){
+                } catch (Exception e) {
                     System.out.println("Connection to Server lost.");
                 }
             });
@@ -113,7 +113,7 @@ public class ClientTCP {
 
             socket.close();
             System.out.println("Connection closed.");
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -138,8 +138,20 @@ public class ClientTCP {
                     case LOGIN_SUCCESS:
                         clientController.callbackLoginSuccess();
                         break;
+                    case LOGIN_FAIL_USERNAME:
+                        clientController.callbackLoginFailureUsername();
+                        break;
+                    case LOGIN_FAIL_PASSWORD:
+                        clientController.callbackLoginFailurePassword();
+                        break;
                     case LOGOUT_SUCCESS:
                         clientController.callbackLogoutSuccess();
+                        break;
+                    case REGISTER_SUCCESS:
+                        clientController.callbackRegisterSuccess();
+                        break;
+                    case REGISTER_FAIL:
+                        clientController.callbackRegisterFail();
                         break;
                     case ERROR:
                         System.out.println("Received Error from Server: " + msg.getError());
@@ -166,6 +178,13 @@ public class ClientTCP {
 
     public void userLogout() {
         NetMessage m = new NetMessage(NetType.LOGOUT);
+        out.println(msgSer.toJson(m));
+    }
+
+    public void userRegister(String username, String password) {
+        NetMessage m = new NetMessage(NetType.REGISTER);
+        m.setUsername(username);
+        m.setPassword(password);
         out.println(msgSer.toJson(m));
     }
 }

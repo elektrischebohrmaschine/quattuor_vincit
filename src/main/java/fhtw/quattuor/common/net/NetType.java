@@ -2,7 +2,8 @@ package fhtw.quattuor.common.net;
 
 public enum NetType {
     LOGIN,
-    LOGIN_FAIL,
+    LOGIN_FAIL_USERNAME,
+    LOGIN_FAIL_PASSWORD,
     LOGIN_SUCCESS,
     LOGOUT,
     LOGOUT_SUCCESS,

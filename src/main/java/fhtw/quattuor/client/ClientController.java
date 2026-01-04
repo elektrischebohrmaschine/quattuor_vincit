@@ -6,6 +6,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import java.util.Optional;
+
 public class ClientController {
 
     private ClientConnectFourGrid connectFourGrid;
@@ -83,6 +85,41 @@ public class ClientController {
             txt_username.clear();
             txt_password.clear();
             btn_login.setText("Go!");
+        });
+    }
+
+    public void callbackLoginFailureUsername() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Login failed");
+            alert.setHeaderText("Username unknown");
+            alert.setContentText("Would you like to register it instead?\nUsing the following password: " + txt_password.getText());
+
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                clientTCP.userRegister(txt_username.getText().trim(), txt_password.getText().trim());
+            }
+        });
+    }
+
+    public void callbackLoginFailurePassword() {
+        Platform.runLater(() -> {
+            btn_login.setText("Wrong Password! Try again?");
+        });
+    }
+
+    public void callbackRegisterSuccess() {
+        connected = true;
+        Platform.runLater(() -> {
+            btn_login.setText("Register Success! Logout?");
+        });
+    }
+
+    public void callbackRegisterFail() {
+        connected = false;
+        Platform.runLater(() -> {
+            btn_login.setText("Registration Failed. Try again?");
         });
     }
 }

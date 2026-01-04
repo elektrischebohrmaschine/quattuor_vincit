@@ -151,10 +151,18 @@ public class ServerMain {
         private void handleLogin(NetMessage msg) {
             Player p = playerService.authenticate(msg.getUsername(), msg.getPassword());
             if (p == null) {
-                NetMessage res = new NetMessage(NetType.LOGIN_FAIL);
-                res.setError("Wrong username or password");
-                out.println(msgSer.toJson(res));
-                return;
+                Player usernameFound = playerService.findByUsername(msg.getUsername());
+                if (usernameFound != null) {
+                    NetMessage res = new NetMessage(NetType.LOGIN_FAIL_PASSWORD);
+                    res.setError("Wrong password for " + msg.getUsername());
+                    out.println(msgSer.toJson(res));
+                    return;
+                } else {
+                    NetMessage res = new NetMessage(NetType.LOGIN_FAIL_USERNAME);
+                    res.setError("User does not exist");
+                    out.println(msgSer.toJson(res));
+                    return;
+                }
             }
 
             loggedInPlayer = p;
@@ -177,6 +185,7 @@ public class ServerMain {
             }
 
             playerService.safePlayersToDisk();
+            loggedInPlayer = playerService.authenticate(msg.getUsername(), msg.getPassword());
 
             NetMessage res = new NetMessage(NetType.REGISTER_SUCCESS);
             res.setUsername(msg.getUsername());
