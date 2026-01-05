@@ -3,6 +3,7 @@ module fhtw.quattuor.client {
     requires javafx.fxml;
     requires java.sql;
     requires java.desktop;
+    requires com.fasterxml.jackson.databind;
 
     opens fhtw.quattuor.client to javafx.fxml;
     exports fhtw.quattuor.client;

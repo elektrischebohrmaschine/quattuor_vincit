@@ -2,6 +2,9 @@ package fhtw.quattuor.server;
 
 
 
+import fhtw.quattuor.common.model.Player;
+import fhtw.quattuor.common.serialization.PlayerSerializer;
+
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -9,8 +12,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ServerMain {
 
     private final CopyOnWriteArrayList<ClientHandler> clients = new CopyOnWriteArrayList<>();
+    private static ServerPlayerService playerService;
 
     public static void main(String[] args) {
+        playerService = new ServerPlayerService();
+        playerService.loadPlayersFromDisk();
+        playerService.printPlayerUsernames();
+
         ServerMain server = new ServerMain();
         server.start(5000);
     }
@@ -86,6 +94,13 @@ public class ServerMain {
                     System.out.println("Empfangen von: " + clientSocket.getInetAddress() + ": " + input);
 
                     //Game Logic
+                    if(input.startsWith("{")){
+                        // Catch JSON and interpret it
+                        PlayerSerializer playerSerializer = new PlayerSerializer();
+                        Player player = playerSerializer.deserializePlayer(input);
+                        playerService.registerOrUpdate(player);
+                        playerService.safePlayersToDisk();
+                    }
 
                     server.broadcast(input, this);
                 }
