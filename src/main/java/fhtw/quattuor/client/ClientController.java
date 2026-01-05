@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.control.TextField;
 
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ public class ClientController {
     private ClientConnectFourGrid connectFourGrid;
     private boolean connected = false;
     ClientTCP clientTCP = new ClientTCP(this);
+
 
     @FXML
     private TextField txt_username;
@@ -30,14 +32,24 @@ public class ClientController {
     private Button btn_login;
     @FXML
     private ToggleButton btn_turn;
+    @FXML
+    private SplitMenuButton splitLevels;
+    @FXML
+    private MenuItem level1;
+    @FXML
+    private MenuItem level2;
+    @FXML
+    private MenuItem level3;
 
     @FXML
     public void initialize() {
 
+        level1.setOnAction(e -> connectFourGrid.startLevel(1));
+        level2.setOnAction(e -> connectFourGrid.startLevel(2));
+        level3.setOnAction(e -> connectFourGrid.startLevel(3));
+
         connectFourGrid = new ClientConnectFourGrid();
-
         VBox gridNode = connectFourGrid.generateGrid();
-
         boardContainer.getChildren().add(gridNode);
     }
 

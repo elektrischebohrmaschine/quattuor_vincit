@@ -38,12 +38,4 @@ public class Board {
     public void setCellStatus(int x, int y, CellStatus status) {
         board[x][y] = status;
     }
-
-    public CellStatus[][] getBoard() {
-        return board;
-    }
-
-    public void setBoard(CellStatus[][] board) {
-        this.board = board;
-    }
 }

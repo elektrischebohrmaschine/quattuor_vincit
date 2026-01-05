@@ -1,26 +1,34 @@
 package fhtw.quattuor.client;
 
 import fhtw.quattuor.common.logic.GameLogicSingle;
+import fhtw.quattuor.common.logic.SingleLevels;
+import fhtw.quattuor.common.model.CellStatus;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class ClientConnectFourGrid {
-    final private int GRID_SIZE_X = 6;
-    final private int GRID_SIZE_Y = 7;
-    Button[][] buttonArray = new Button[GRID_SIZE_X][GRID_SIZE_Y];
-    GameLogicSingle logic = new GameLogicSingle(GRID_SIZE_X, GRID_SIZE_Y);
+    final private int GRID_HEIGHT_X = 6;
+    final private int GRID_WIDTH_Y = 7;
+
+    Button[][] buttonArray = new Button[GRID_HEIGHT_X][GRID_WIDTH_Y];
+    GameLogicSingle logic = new GameLogicSingle(GRID_HEIGHT_X, GRID_WIDTH_Y);
+    TextField showsWinner = new TextField();
 
     final private int BTN_SIZE = 50;
     final private int BTN_SPACING = 2;
 
     public VBox generateGrid() {
         VBox outer = new VBox();
-        HBox[] hBoxArray = new HBox[GRID_SIZE_X];
+        HBox[] hBoxArray = new HBox[GRID_HEIGHT_X];
 
-        for (int i = 0; i < GRID_SIZE_X; i++) {
+        outer.getChildren().add(showsWinner);
+
+        for (int i = 0; i < GRID_HEIGHT_X; i++) {
             hBoxArray[i] = new HBox();
-            for (int j = 0; j < GRID_SIZE_Y; j++) {
+            for (int j = 0; j < GRID_WIDTH_Y; j++) {
                 Button btn = new Button(" ");
                 btn.setPrefSize(BTN_SIZE, BTN_SIZE);
                 btn.setStyle("-fx-background-color: lightgray;");
@@ -32,6 +40,11 @@ public class ClientConnectFourGrid {
                 hBoxArray[i].getChildren().add(buttonArray[i][j]);
             }
             hBoxArray[i].setSpacing(BTN_SPACING);
+            hBoxArray[i].setAlignment(Pos.CENTER);
+            showsWinner.setEditable(false);
+            showsWinner.setPromptText("WHO IS WINNING??");
+            showsWinner.setAlignment(Pos.CENTER);
+
             outer.getChildren().addAll(hBoxArray[i]);
         }
 
@@ -48,6 +61,64 @@ public class ClientConnectFourGrid {
                 buttonArray[row][col].setStyle("-fx-background-color: red;");
             } else {
                 buttonArray[row][col].setStyle("-fx-background-color: yellow;");
+            }
+        }
+
+        int winner = logic.getWinner();
+        if(logic.getLevelMode()){
+            if(winner== 1){
+                showsWinner.setText("Yaaay you won");
+                disableButtons();
+            } else {
+                showsWinner.setText("Yaaay you lost");
+                disableButtons();
+            }
+        }else {
+            if (winner == 1 || winner == 2) {
+                showsWinner.setText("WINNER: " + winner);
+                disableButtons();
+            } else if (winner == 3) {
+                showsWinner.setText("its a draw");
+                disableButtons();
+            }
+        }
+    }
+
+    public void disableButtons() {
+        for (Button[] row: buttonArray) {
+            for (Button button: row) {
+                button.setDisable(true);
+            }
+        }
+    }
+
+    public void startLevel(int level){
+
+        SingleLevels lvl;
+
+        switch(level){
+            case 1: lvl = SingleLevels.Level1(logic.getBoard());
+                break;
+            case 2: lvl = SingleLevels.Level2(logic.getBoard());
+                break;
+            case 3: lvl = SingleLevels.Level3(logic.getBoard());
+                break;
+            default:
+                return;
+        }
+
+        logic.LevelLaden(lvl);
+
+        for (int row = 0; row < buttonArray.length; row++) {
+            for (int col = 0; col < buttonArray[0].length; col++) {
+                CellStatus status= logic.getBoard().getCellStatus(row, col);
+                if (status == CellStatus.PLAYER1) {
+                    buttonArray[row][col].setStyle("-fx-background-color: yellow;");
+                } else if (status == CellStatus.PLAYER2) {
+                    buttonArray[row][col].setStyle("-fx-background-color: red;");
+                }else {
+                    buttonArray[row][col].setStyle("-fx-background-color: lightgray;");
+                }
             }
         }
     }
