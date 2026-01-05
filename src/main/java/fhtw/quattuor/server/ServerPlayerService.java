@@ -63,4 +63,49 @@ public class ServerPlayerService {
         }
         System.out.println("-------------------");
     }
+
+    public boolean existsUsername(String username) {
+        if (username == null) return false;
+        for (Player p : players) {
+            if (username.equals(p.getUsername()))
+                return true;
+        }
+        return false;
+    }
+
+    public Player findByUsername(String username) {
+        if (username == null) return null;
+        for (Player p : players) {
+            if (username.equals(p.getUsername()))
+                return p;
+        }
+        return null;
+    }
+
+    public Player authenticate(String username, String password) {
+        Player p = findByUsername(username);
+        if (p == null) {
+            return null;
+        }
+        if (p.getPassword() == null) {
+            return null;
+        }
+        if (p.getPassword().equals(password)) {
+            return p;
+        }
+        return null;
+    }
+
+
+    public boolean register(String username, String password) {
+        if (username == null || username.isBlank())
+            return false;
+        if (password == null || password.isBlank())
+            return false;
+        if (existsUsername(username))
+            return false;
+
+        players.add(new Player(username, password));
+        return true;
+    }
 }
