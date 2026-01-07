@@ -71,16 +71,16 @@
                <children>
                   <ToolBar prefHeight="40.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                     <items>
-                        <Text fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Oponment: " />
+                        <Text fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Opponent: " />
                         <Text fx:id="txt_player" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="insert username? " />
-                       <Text text="Color:" />
-                       <ColorPicker fx:id="colorPrimary" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Primary">
+                       <Text text="Player:" />
+                       <ColorPicker fx:id="playerColor" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Player">
                           <value>
                              <Color red="1.0" green="0.8352941" blue="0.0" />
                           </value>
                        </ColorPicker>
-                       <Text text="Plan B:" />
-                       <ColorPicker fx:id="colorFallback" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Fallback">
+                       <Text text="Opponent:" />
+                       <ColorPicker fx:id="opponentColor" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Opponent">
                           <value>
                              <Color red="1.0" green="0.0" blue="0.0" />
                           </value>

@@ -81,8 +81,8 @@ public class ClientTCP {
         Player p = new Player();
         p.setUsername(currentUsername);
         p.setPassword(currentPassword);
-        p.setPrimaryColor(primaryHex);
-        p.setFallbackColor(fallbackHex);
+        p.setPlayerColor(primaryHex);
+        p.setOpponentColor(fallbackHex);
 
         NetMessage m = new NetMessage(NetType.PLAYER_UPDATE);
         m.setUsername(currentUsername);

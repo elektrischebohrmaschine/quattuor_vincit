@@ -7,9 +7,8 @@ public class Player {
     private String username;
     private String password;
     private int highscore;
-    private String primaryColor = "#FF0000"; //ROT
-    private String fallbackColor = "#FFD500"; //GELB
-    private String assignedColor = "#FF0000"; // default
+    private String playerColor = "#FF0000"; //ROT
+    private String opponentColor = "#FFD500"; //GELB
 
 
     private List<GameSession> gameSessions;
@@ -23,9 +22,8 @@ public class Player {
         this.password = password;
         this.highscore = 0;
         this.gameSessions = new ArrayList<>();
-        this.primaryColor = "#FFD500";
-        this.fallbackColor = "#FF0000";
-        this.assignedColor = this.primaryColor;
+        this.playerColor = "#FFD500";
+        this.opponentColor = "#FF0000";
     }
 
     public String getUsername() {
@@ -40,16 +38,12 @@ public class Player {
         return highscore;
     }
 
-    public String getPrimaryColor() {
-        return primaryColor;
+    public String getPlayerColor() {
+        return playerColor;
     }
 
-    public String getFallbackColor() {
-        return fallbackColor;
-    }
-
-    public String getAssignedColor() {
-        return assignedColor;
+    public String getOpponentColor() {
+        return opponentColor;
     }
 
     public void increaseHighscore() {
@@ -80,16 +74,12 @@ public class Player {
         this.highscore = highscore;
     }
 
-    public void setPrimaryColor(String c) {
-        this.primaryColor = c;
+    public void setPlayerColor(String c) {
+        this.playerColor = c;
     }
 
-    public void setFallbackColor(String c) {
-        this.fallbackColor = c;
-    }
-
-    public void setAssignedColor(String c) {
-        this.assignedColor = c;
+    public void setOpponentColor(String c) {
+        this.opponentColor = c;
     }
 
     public void setGameSessions(List<GameSession> gameSessions) {

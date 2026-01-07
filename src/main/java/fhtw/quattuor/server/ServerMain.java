@@ -270,8 +270,8 @@ public class ServerMain {
                 return;
             }
 
-            loggedInPlayer.setPrimaryColor(updated.getPrimaryColor());
-            loggedInPlayer.setFallbackColor(updated.getFallbackColor());
+            loggedInPlayer.setPlayerColor(updated.getPlayerColor());
+            loggedInPlayer.setOpponentColor(updated.getOpponentColor());
 
             playerService.registerOrUpdate(loggedInPlayer);
             playerService.safePlayersToDisk();

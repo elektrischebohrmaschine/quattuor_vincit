@@ -35,9 +35,9 @@ public class ClientController {
     @FXML
     private VBox boardContainer;
     @FXML
-    private ColorPicker colorPrimary;
+    private ColorPicker playerColor;
     @FXML
-    private ColorPicker colorFallback;
+    private ColorPicker opponentColor;
     @FXML
     private Button btn_login;
     @FXML
@@ -58,8 +58,8 @@ public class ClientController {
         level2.setOnAction(e -> connectFourGrid.startLevel(2));
         level3.setOnAction(e -> connectFourGrid.startLevel(3));
 
-        colorPrimary.setOnAction(e -> sendMyColors());
-        colorFallback.setOnAction(e -> sendMyColors());
+        playerColor.setOnAction(e -> sendMyColors());
+        opponentColor.setOnAction(e -> sendMyColors());
 
         connectFourGrid = new ClientConnectFourGrid();
         VBox gridNode = connectFourGrid.generateGrid();
@@ -141,8 +141,8 @@ public class ClientController {
             try {
                 Player p = new PlayerSerializer().deserializePlayer(playerJson);
                 if (p != null) {
-                    colorPrimary.setValue(javafx.scene.paint.Color.web(p.getPrimaryColor()));
-                    colorFallback.setValue(javafx.scene.paint.Color.web(p.getFallbackColor()));
+                    playerColor.setValue(javafx.scene.paint.Color.web(p.getPlayerColor()));
+                    opponentColor.setValue(javafx.scene.paint.Color.web(p.getOpponentColor()));
                 }
             } catch (Exception ignored) {}
         });
@@ -227,8 +227,8 @@ public class ClientController {
 
     private void sendMyColors() {
         if (!connected) return;
-        String primary = toHex(colorPrimary.getValue());
-        String fallback = toHex(colorFallback.getValue());
+        String primary = toHex(playerColor.getValue());
+        String fallback = toHex(opponentColor.getValue());
         clientTCP.updateMyColors(primary, fallback);
     }
 
