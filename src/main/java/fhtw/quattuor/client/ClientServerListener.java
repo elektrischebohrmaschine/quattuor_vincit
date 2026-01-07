@@ -56,6 +56,12 @@ public class ClientServerListener implements Runnable {
                     case ERROR:
                         System.out.println("Received Error from Server: " + msg.getError());
                         break;
+                    case ONLINE_LIST:
+                        clientController.callbackOnlineList(msg.getPayload());
+                        break;
+                    case PRESENCE_UPDATE:
+                        clientController.callbackPresenceUpdate(msg.getUsername(), msg.getPayload());
+                        break;
                     default:
                         System.out.println("Received Message Type: " + msg.getType());
                         System.out.println("No action planned for this Type.");

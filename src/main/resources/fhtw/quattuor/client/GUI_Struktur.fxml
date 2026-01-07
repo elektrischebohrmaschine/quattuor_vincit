@@ -47,7 +47,7 @@
                <tabs>
                   <Tab text="Friendlist">
                      <content>
-                        <ListView prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="list_online" prefHeight="200.0" prefWidth="200.0"/>
                      </content>
                   </Tab>
                   <Tab text="Paused Games">
@@ -73,11 +73,18 @@
                     <items>
                         <Text fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Oponment: " />
                         <Text fx:id="txt_player" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="insert username? " />
-                        <ColorPicker fx:id="colorSelect" editable="true" prefHeight="26.0" prefWidth="113.0" promptText="ze color u chose">
-                           <value>
-                              <Color red="0.31578946113586426" green="0.09473684430122375" blue="0.09473684430122375" />
-                           </value>
-                        </ColorPicker>
+                       <Text text="Color:" />
+                       <ColorPicker fx:id="colorPrimary" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Primary">
+                          <value>
+                             <Color red="1.0" green="0.8352941" blue="0.0" />
+                          </value>
+                       </ColorPicker>
+                       <Text text="Plan B:" />
+                       <ColorPicker fx:id="colorFallback" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Fallback">
+                          <value>
+                             <Color red="1.0" green="0.0" blue="0.0" />
+                          </value>
+                       </ColorPicker>
                         <ToggleButton fx:id="btn_turn" mnemonicParsing="false" prefHeight="26.0" prefWidth="94.0" text="your turn" textAlignment="CENTER">
                            <opaqueInsets>
                               <Insets />

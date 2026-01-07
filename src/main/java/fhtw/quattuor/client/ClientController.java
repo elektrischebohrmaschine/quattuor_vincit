@@ -5,7 +5,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.control.TextField;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.scene.shape.Circle;
+import javafx.scene.layout.HBox;
+import javafx.geometry.Pos;
+
 
 import java.util.Optional;
 
@@ -27,7 +33,9 @@ public class ClientController {
     @FXML
     private VBox boardContainer;
     @FXML
-    private ColorPicker colorSelect;
+    private ColorPicker colorPrimary;
+    @FXML
+    private ColorPicker colorFallback;
     @FXML
     private Button btn_login;
     @FXML
@@ -48,9 +56,41 @@ public class ClientController {
         level2.setOnAction(e -> connectFourGrid.startLevel(2));
         level3.setOnAction(e -> connectFourGrid.startLevel(3));
 
+        colorPrimary.setOnAction(e -> sendMyColors());
+        colorFallback.setOnAction(e -> sendMyColors());
+
         connectFourGrid = new ClientConnectFourGrid();
         VBox gridNode = connectFourGrid.generateGrid();
         boardContainer.getChildren().add(gridNode);
+        if (list_online != null) {
+            list_online.setItems(onlineItems);
+            list_online.setCellFactory(lv -> new ListCell<>() {
+                private final Circle statusDot = new Circle(6);
+                private final Label nameLabel = new Label();
+                private final HBox container = new HBox(8);
+
+                {
+                    container.setAlignment(Pos.CENTER_LEFT);
+                    container.getChildren().addAll(statusDot, nameLabel);
+                }
+
+                @Override
+                protected void updateItem(String username, boolean empty) {
+                    super.updateItem(username, empty);
+
+                    if (empty || username == null) {
+                        setGraphic(null);
+                    } else {
+                        nameLabel.setText(username);
+
+                        statusDot.setStyle("-fx-fill: #2ecc71;");
+
+                        setGraphic(container);
+                    }
+                }
+            });
+
+        }
     }
 
     @FXML
@@ -84,6 +124,13 @@ public class ClientController {
         clientTCP.userLogin(txt_username.getText().trim(), txt_password.getText().trim());
     }
 
+    @FXML
+    private ListView<String> list_online;
+
+    private final ObservableList<String> onlineItems = FXCollections.observableArrayList();
+    private final ObjectMapper om = new ObjectMapper();
+
+
     public void callbackLoginSuccess() {
         connected = true;
         Platform.runLater(() -> {
@@ -96,6 +143,7 @@ public class ClientController {
         Platform.runLater(() -> {
             txt_username.clear();
             txt_password.clear();
+            onlineItems.clear();
             btn_login.setText("Go!");
         });
     }
@@ -134,4 +182,45 @@ public class ClientController {
             btn_login.setText("Registration Failed. Try again?");
         });
     }
+    public void callbackOnlineList(String jsonPayload) {
+        Platform.runLater(() -> {
+            try {
+                String[] arr = om.readValue(jsonPayload, String[].class);
+                onlineItems.setAll(arr);
+                onlineItems.sort(String::compareToIgnoreCase);
+            } catch (Exception e) {
+                System.out.println("ONLINE_LIST parse failed: " + e.getMessage());
+            }
+        });
+    }
+
+    public void callbackPresenceUpdate(String username, String status) {
+        Platform.runLater(() -> {
+            boolean online = "ONLINE".equalsIgnoreCase(status);
+
+            if (online) {
+                if (!onlineItems.contains(username)) onlineItems.add(username);
+            } else {
+                onlineItems.remove(username);
+            }
+
+            onlineItems.sort(String::compareToIgnoreCase);
+        });
+    }
+
+    private static String toHex(javafx.scene.paint.Color c) {
+        int r = (int)Math.round(c.getRed() * 255);
+        int g = (int)Math.round(c.getGreen() * 255);
+        int b = (int)Math.round(c.getBlue() * 255);
+        return String.format("#%02X%02X%02X", r, g, b);
+    }
+
+    private void sendMyColors() {
+        if (!connected) return;
+        String primary = toHex(colorPrimary.getValue());
+        String fallback = toHex(colorFallback.getValue());
+        clientTCP.updateMyColors(primary, fallback);
+    }
+
+
 }
