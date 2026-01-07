@@ -92,4 +92,9 @@ public class ClientTCP {
         out.println(msgSer.toJson(m));
     }
 
+    public void requestHighscores() {
+        NetMessage m = new NetMessage(NetType.HIGHSCORE_REQUEST);
+        out.println(msgSer.toJson(m));
+    }
+
 }

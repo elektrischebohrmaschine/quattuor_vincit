@@ -62,6 +62,9 @@ public class ClientServerListener implements Runnable {
                     case PRESENCE_UPDATE:
                         clientController.callbackPresenceUpdate(msg.getUsername(), msg.getPayload());
                         break;
+                    case HIGHSCORE_LIST:
+                        clientController.callbackHighscoreList(msg.getPayload());
+                        break;
                     default:
                         System.out.println("Received Message Type: " + msg.getType());
                         System.out.println("No action planned for this Type.");

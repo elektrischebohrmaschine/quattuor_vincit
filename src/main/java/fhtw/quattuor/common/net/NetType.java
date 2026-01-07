@@ -16,6 +16,8 @@ public enum NetType {
     NOT_LOGGED_IN,
     ONLINE_LIST,
     PRESENCE_UPDATE,
+    HIGHSCORE_LIST,
+    HIGHSCORE_REQUEST,
     FORBIDDEN,
     ERROR
 }

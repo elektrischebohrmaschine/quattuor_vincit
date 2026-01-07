@@ -54,7 +54,11 @@
                      <content>
                         <ListView prefHeight="200.0" prefWidth="200.0" />
                      </content></Tab>
-                  <Tab text="Highscore" />
+                  <Tab text="Highscore">
+                  <content>
+                     <ListView fx:id="list_highscore" />
+                  </content>
+                  </Tab>
                </tabs>
                <VBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

@@ -10,6 +10,8 @@ import fhtw.quattuor.common.serialization.PlayerSerializer;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -138,6 +140,10 @@ public class ServerMain {
                             case NetType.PLAYER_UPDATE:
                                 handlePlayerUpdate(msg);
                                 break;
+                            case NetType.HIGHSCORE_REQUEST:
+                                handleHighscoreRequest();
+                                break;
+
                             case NetType.LOGOUT:
                                 handleLogout();
                                 break;
@@ -280,6 +286,21 @@ public class ServerMain {
             res.setUsername(loggedInPlayer.getUsername());
             out.println(msgSer.toJson(res));
         }
+
+        private void handleHighscoreRequest() {
+
+            List<Player> sorted = new ArrayList<>(playerService.getPlayers());
+            sorted.sort((a, b) -> Integer.compare(b.getHighscore(), a.getHighscore()));
+
+            //Top 10
+            int limit = Math.min(10, sorted.size());
+            List<Player> top = sorted.subList(0, limit);
+
+            NetMessage res = new NetMessage(NetType.HIGHSCORE_LIST);
+            res.setPayload(new PlayerSerializer().serializePlayers(top));
+            out.println(msgSer.toJson(res));
+        }
+
 
 
 

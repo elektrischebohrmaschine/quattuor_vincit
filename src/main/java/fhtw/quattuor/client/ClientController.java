@@ -54,6 +54,8 @@ public class ClientController {
     @FXML
     public void initialize() {
 
+        connectFourGrid = new ClientConnectFourGrid();
+
         level1.setOnAction(e -> connectFourGrid.startLevel(1));
         level2.setOnAction(e -> connectFourGrid.startLevel(2));
         level3.setOnAction(e -> connectFourGrid.startLevel(3));
@@ -61,7 +63,7 @@ public class ClientController {
         playerColor.setOnAction(e -> sendMyColors());
         opponentColor.setOnAction(e -> sendMyColors());
 
-        connectFourGrid = new ClientConnectFourGrid();
+
         VBox gridNode = connectFourGrid.generateGrid();
         boardContainer.getChildren().add(gridNode);
         if (list_online != null) {
@@ -93,6 +95,7 @@ public class ClientController {
             });
 
         }
+        if (list_highscore != null) list_highscore.setItems(highscoreItems);
     }
 
     @FXML
@@ -145,6 +148,8 @@ public class ClientController {
                     opponentColor.setValue(javafx.scene.paint.Color.web(p.getOpponentColor()));
                 }
             } catch (Exception ignored) {}
+
+            clientTCP.requestHighscores();
         });
     }
 
@@ -218,6 +223,24 @@ public class ClientController {
         });
     }
 
+    public void callbackHighscoreList(String payloadJson) {
+        Platform.runLater(() -> {
+            try {
+                var players = playerSer.deserializePlayers(payloadJson);
+                highscoreItems.clear();
+
+                int rank = 1;
+                for (Player p : players) {
+                    highscoreItems.add(rank + ". " + p.getUsername() + " — " + p.getHighscore());
+                    rank++;
+                }
+            } catch (Exception e) {
+                System.out.println("HIGHSCORE_LIST parse failed: " + e.getMessage());
+            }
+        });
+    }
+
+
     private static String toHex(javafx.scene.paint.Color c) {
         int r = (int)Math.round(c.getRed() * 255);
         int g = (int)Math.round(c.getGreen() * 255);
@@ -227,10 +250,14 @@ public class ClientController {
 
     private void sendMyColors() {
         if (!connected) return;
-        String primary = toHex(playerColor.getValue());
-        String fallback = toHex(opponentColor.getValue());
-        clientTCP.updateMyColors(primary, fallback);
+        String playerCl = toHex(playerColor.getValue());
+        String opponentCl = toHex(opponentColor.getValue());
+        clientTCP.updateMyColors(playerCl, opponentCl);
     }
+
+    @FXML private ListView<String> list_highscore;
+    private final ObservableList<String> highscoreItems = FXCollections.observableArrayList();
+    private final PlayerSerializer playerSer = new PlayerSerializer();
 
 
 }
