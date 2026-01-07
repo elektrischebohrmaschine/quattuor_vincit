@@ -36,7 +36,7 @@ public class ClientServerListener implements Runnable {
 
                 switch (msg.getType()) {
                     case LOGIN_SUCCESS:
-                        clientController.callbackLoginSuccess();
+                        clientController.callbackLoginSuccess(msg.getPayload());
                         break;
                     case LOGIN_FAIL_USERNAME:
                         clientController.callbackLoginFailureUsername();

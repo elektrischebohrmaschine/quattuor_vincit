@@ -1,5 +1,7 @@
 package fhtw.quattuor.client;
 
+import fhtw.quattuor.common.model.Player;
+import fhtw.quattuor.common.serialization.PlayerSerializer;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -131,10 +133,18 @@ public class ClientController {
     private final ObjectMapper om = new ObjectMapper();
 
 
-    public void callbackLoginSuccess() {
+    public void callbackLoginSuccess(String playerJson) {
         connected = true;
         Platform.runLater(() -> {
            btn_login.setText("We are logged in baybeeeeeeeee! (Logout)");
+
+            try {
+                Player p = new PlayerSerializer().deserializePlayer(playerJson);
+                if (p != null) {
+                    colorPrimary.setValue(javafx.scene.paint.Color.web(p.getPrimaryColor()));
+                    colorFallback.setValue(javafx.scene.paint.Color.web(p.getFallbackColor()));
+                }
+            } catch (Exception ignored) {}
         });
     }
 
