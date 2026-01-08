@@ -171,5 +171,6 @@ public class ClientConnectFourGrid {
         } else  {
             playerTwoColor = "-fx-background-color: " + color + ";";
         }
+        setAllColours();
     }
 }
