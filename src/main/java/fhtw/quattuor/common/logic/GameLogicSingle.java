@@ -5,7 +5,8 @@ import fhtw.quattuor.common.model.CellStatus;
 
 public class GameLogicSingle {
     private boolean player_one_turn = true;
-    private boolean LevelMode= false;
+    private boolean levelMode = false;
+    private SingleLevels singleLevels;
     private Board board;
 
     public GameLogicSingle(int size_x, int size_y) {
@@ -30,21 +31,25 @@ public class GameLogicSingle {
             } else {
                 board.setCellStatus(x, y, CellStatus.PLAYER2);
             }
-        toggle_player_turn();
 
-        valid= true;
+        valid = true;
 
         // DEBUG - Remove later :)
         board.print_board();
+
         return valid;
     }
 
-    private void toggle_player_turn() {
+    public void toggle_player_turn() {
         player_one_turn = !player_one_turn;
     }
 
     public boolean isPlayer_one_turn() {
         return player_one_turn;
+    }
+
+    public void setPlayer_one_turn(boolean player_one_turn) {
+        this.player_one_turn = player_one_turn;
     }
 
     public int checkWinCondition(Board board) {
@@ -173,7 +178,20 @@ public class GameLogicSingle {
     }
 
     public void LevelLaden (SingleLevels level){
-        this.board = level.board;
+        this.board = level.getBoard();
+        this.singleLevels = level;
+    }
+
+    public void decreaseMaxMoves() {
+        singleLevels.setMaxMoves(singleLevels.getMaxMoves() - 1);
+    }
+
+    public int getMaxMoves(){
+        return singleLevels.getMaxMoves();
+    }
+
+    public void enemyTurn() {
+        this.board = singleLevels.enemyTurn(board);
     }
 
     public Board getBoard() {
@@ -181,6 +199,10 @@ public class GameLogicSingle {
     }
 
     public boolean getLevelMode() {
-       return LevelMode;
+       return levelMode;
+    }
+
+    public void setLevelMode(boolean levelMode) {
+        this.levelMode = levelMode;
     }
 }
