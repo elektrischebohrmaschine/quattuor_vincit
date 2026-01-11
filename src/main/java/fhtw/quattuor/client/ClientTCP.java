@@ -1,8 +1,10 @@
 package fhtw.quattuor.client;
 
+import fhtw.quattuor.common.model.Player;
 import fhtw.quattuor.common.net.NetMessage;
 import fhtw.quattuor.common.net.NetType;
 import fhtw.quattuor.common.serialization.NetMessageSerializer;
+import fhtw.quattuor.common.serialization.PlayerSerializer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,12 +21,17 @@ public class ClientTCP {
     private PrintWriter out;
     private BufferedReader in;
     private NetMessageSerializer msgSer;
+    private String currentUsername;
+    private String currentPassword;
+    private final PlayerSerializer playerSer = new PlayerSerializer();
 
     private final String host = "localhost";
     private final int port = 5000;
 
     public ClientTCP(ClientController clientController) {
         this.clientController = clientController;
+
+
 
         try {
             socket = new Socket(host, port);
@@ -44,6 +51,8 @@ public class ClientTCP {
     }
 
     public void userLogin(String username, String password) {
+        currentUsername = username;
+        currentPassword = password;
         NetMessage m = new NetMessage(NetType.LOGIN);
         m.setUsername(username);
         m.setPassword(password);
@@ -53,12 +62,39 @@ public class ClientTCP {
     public void userLogout() {
         NetMessage m = new NetMessage(NetType.LOGOUT);
         out.println(msgSer.toJson(m));
+        currentUsername = null;
+        currentPassword = null;
     }
 
     public void userRegister(String username, String password) {
+        currentUsername = username;
+        currentPassword = password;
         NetMessage m = new NetMessage(NetType.REGISTER);
         m.setUsername(username);
         m.setPassword(password);
         out.println(msgSer.toJson(m));
     }
+
+    public void updateMyColors(String primaryHex, String fallbackHex) {
+        if (currentUsername == null || currentPassword == null) return;
+
+        Player p = new Player();
+        p.setUsername(currentUsername);
+        p.setPassword(currentPassword);
+        p.setPlayerColor(primaryHex);
+        p.setOpponentColor(fallbackHex);
+
+        NetMessage m = new NetMessage(NetType.PLAYER_UPDATE);
+        m.setUsername(currentUsername);
+        m.setPassword(currentPassword);
+        m.setPayload(playerSer.serializePlayer(p));
+
+        out.println(msgSer.toJson(m));
+    }
+
+    public void requestHighscores() {
+        NetMessage m = new NetMessage(NetType.HIGHSCORE_REQUEST);
+        out.println(msgSer.toJson(m));
+    }
+
 }

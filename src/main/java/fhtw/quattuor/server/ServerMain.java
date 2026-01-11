@@ -10,12 +10,18 @@ import fhtw.quattuor.common.serialization.PlayerSerializer;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ServerMain {
 
     private final CopyOnWriteArrayList<ClientHandler> clients = new CopyOnWriteArrayList<>();
     private static ServerPlayerService playerService;
+    private final Set<String> onlineUsers = ConcurrentHashMap.newKeySet();
 
     public static void main(String[] args) {
         playerService = new ServerPlayerService();
@@ -63,6 +69,21 @@ public class ServerMain {
     }
 
     //Testing end
+
+    public void broadcastNet(NetMessage msg) {
+        NetMessageSerializer ser = new NetMessageSerializer();
+        String json = ser.toJson(msg);
+        for (ClientHandler handler : clients) {
+            handler.send(json);
+        }
+    }
+
+    public void broadcastPresence(String username, boolean online) {
+        NetMessage msg = new NetMessage(NetType.PRESENCE_UPDATE);
+        msg.setUsername(username);
+        msg.setPayload(online ? "ONLINE" : "OFFLINE");
+        broadcastNet(msg);
+    }
 
     private class ClientHandler implements Runnable {
         private final Socket clientSocket;
@@ -119,6 +140,10 @@ public class ServerMain {
                             case NetType.PLAYER_UPDATE:
                                 handlePlayerUpdate(msg);
                                 break;
+                            case NetType.HIGHSCORE_REQUEST:
+                                handleHighscoreRequest();
+                                break;
+
                             case NetType.LOGOUT:
                                 handleLogout();
                                 break;
@@ -137,12 +162,22 @@ public class ServerMain {
             } catch (IOException e) {
                 System.out.println("Client disconnected: " + clientSocket.getInetAddress());
             } finally {
+                if (loggedInPlayer != null) {
+                    String u = loggedInPlayer.getUsername();
+                    server.onlineUsers.remove(u);
+                    server.broadcastPresence(u, false);
+                }
                 server.removeClients(this);
                 try { clientSocket.close(); } catch (IOException ignored) {}
             }
         }
 
         private void handleLogout() {
+            if (loggedInPlayer != null) {
+                String u = loggedInPlayer.getUsername();
+                server.onlineUsers.remove(u);
+                server.broadcastPresence(u, false);
+            }
             loggedInPlayer = null;
             NetMessage res = new NetMessage(NetType.LOGOUT_SUCCESS);
             out.println(msgSer.toJson(res));
@@ -166,13 +201,23 @@ public class ServerMain {
             }
 
             loggedInPlayer = p;
+            server.onlineUsers.add(p.getUsername());
 
             NetMessage res = new NetMessage(NetType.LOGIN_SUCCESS);
             res.setUsername(p.getUsername());
             res.setPassword(p.getPassword());
-            // optional: gleich Player zurückgeben
             res.setPayload(playerSer.serializePlayer(p));
             out.println(msgSer.toJson(res));
+
+            try {
+                NetMessage list = new NetMessage(NetType.ONLINE_LIST);
+                list.setPayload(new ObjectMapper().writeValueAsString(server.onlineUsers));
+                out.println(msgSer.toJson(list));
+            } catch (Exception e) {
+                sendError(NetType.ERROR, "Could not create ONLINE_LIST");
+            }
+
+            server.broadcastPresence(p.getUsername(), true);
         }
 
         private void handleRegister(NetMessage msg) {
@@ -191,7 +236,24 @@ public class ServerMain {
             res.setUsername(msg.getUsername());
             res.setPassword(msg.getPassword());
             out.println(msgSer.toJson(res));
+
+            if (loggedInPlayer == null) {
+                return;
+            }
+
+            server.onlineUsers.add(loggedInPlayer.getUsername());
+
+            try {
+                NetMessage list = new NetMessage(NetType.ONLINE_LIST);
+                list.setPayload(new ObjectMapper().writeValueAsString(server.onlineUsers));
+                out.println(msgSer.toJson(list));
+            } catch (Exception e) {
+                sendError(NetType.ERROR, "Could not create ONLINE_LIST");
+            }
+
+            server.broadcastPresence(loggedInPlayer.getUsername(), true);
         }
+
 
         private void handlePlayerUpdate(NetMessage msg) {
             if (loggedInPlayer == null) {
@@ -214,14 +276,33 @@ public class ServerMain {
                 return;
             }
 
-            playerService.registerOrUpdate(updated);
+            loggedInPlayer.setPlayerColor(updated.getPlayerColor());
+            loggedInPlayer.setOpponentColor(updated.getOpponentColor());
+
+            playerService.registerOrUpdate(loggedInPlayer);
             playerService.safePlayersToDisk();
 
             NetMessage res = new NetMessage(NetType.PLAYER_UPDATE_SUCCESS);
-            res.setUsername(updated.getUsername());
-            res.setPassword(updated.getPassword());
+            res.setUsername(loggedInPlayer.getUsername());
             out.println(msgSer.toJson(res));
         }
+
+        private void handleHighscoreRequest() {
+
+            List<Player> sorted = new ArrayList<>(playerService.getPlayers());
+            sorted.sort((a, b) -> Integer.compare(b.getHighscore(), a.getHighscore()));
+
+            //Top 10
+            int limit = Math.min(10, sorted.size());
+            List<Player> top = sorted.subList(0, limit);
+
+            NetMessage res = new NetMessage(NetType.HIGHSCORE_LIST);
+            res.setPayload(new PlayerSerializer().serializePlayers(top));
+            out.println(msgSer.toJson(res));
+        }
+
+
+
 
         private void sendError(NetType code, String text) {
             NetMessage res = new NetMessage(code);

@@ -7,6 +7,10 @@ public class Player {
     private String username;
     private String password;
     private int highscore;
+    private String playerColor = "#FF0000"; //ROT
+    private String opponentColor = "#FFD500"; //GELB
+
+
     private List<GameSession> gameSessions;
 
     public Player() {
@@ -18,6 +22,8 @@ public class Player {
         this.password = password;
         this.highscore = 0;
         this.gameSessions = new ArrayList<>();
+        this.playerColor = "#FFD500";
+        this.opponentColor = "#FF0000";
     }
 
     public String getUsername() {
@@ -32,9 +38,18 @@ public class Player {
         return highscore;
     }
 
+    public String getPlayerColor() {
+        return playerColor;
+    }
+
+    public String getOpponentColor() {
+        return opponentColor;
+    }
+
     public void increaseHighscore() {
         highscore++;
     }
+
 
     public List<GameSession> getGameSessions() {
         return gameSessions;
@@ -59,7 +74,16 @@ public class Player {
         this.highscore = highscore;
     }
 
+    public void setPlayerColor(String c) {
+        this.playerColor = c;
+    }
+
+    public void setOpponentColor(String c) {
+        this.opponentColor = c;
+    }
+
     public void setGameSessions(List<GameSession> gameSessions) {
         this.gameSessions = gameSessions;
     }
+
 }
