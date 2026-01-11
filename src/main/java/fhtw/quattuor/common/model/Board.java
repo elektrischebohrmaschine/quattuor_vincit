@@ -3,9 +3,6 @@ package fhtw.quattuor.common.model;
 public class Board {
     private CellStatus[][] board;
 
-    public Board() {
-    }
-
     public Board(int size_x, int size_y) {
         this.board = new CellStatus[size_x][size_y];
         for (int i = 0; i < size_x; i++) {
@@ -54,4 +51,5 @@ public class Board {
     public int getWidth(){
         return board[0].length;
     }
+
 }

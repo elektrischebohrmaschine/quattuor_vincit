@@ -1,7 +1,5 @@
 package fhtw.quattuor.server;
 
-
-
 import fhtw.quattuor.common.model.Player;
 import fhtw.quattuor.common.net.NetMessage;
 import fhtw.quattuor.common.net.NetType;

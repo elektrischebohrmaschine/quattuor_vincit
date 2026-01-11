@@ -1,5 +1,6 @@
 package fhtw.quattuor.client;
 
+import fhtw.quattuor.common.model.GameSession;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -7,6 +8,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.control.TextField;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ClientController {
@@ -40,6 +42,9 @@ public class ClientController {
     private MenuItem level2;
     @FXML
     private MenuItem level3;
+    @FXML
+    private ListView<String> sessionList;
+
 
     @FXML
     public void initialize() {
@@ -51,6 +56,21 @@ public class ClientController {
         connectFourGrid = new ClientConnectFourGrid();
         VBox gridNode = connectFourGrid.generateGrid();
         boardContainer.getChildren().add(gridNode);
+
+        check_synchronisation.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Synchronisation");
+                alert.setContentText("Hiiii, just so u know... synchro is now on =D");
+                alert.showAndWait();
+                clientTCP.requestAllSessions();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Synchronisation");
+                alert.setContentText("Hiiii, just so u know... synchro is now off");
+                alert.showAndWait();
+            }
+        });
     }
 
     @FXML
@@ -87,7 +107,13 @@ public class ClientController {
     public void callbackLoginSuccess() {
         connected = true;
         Platform.runLater(() -> {
-           btn_login.setText("We are logged in baybeeeeeeeee! (Logout)");
+            btn_login.setText("We are logged in baybeeeeeeeee! (Logout)");
+            GameSession testSession = new GameSession();
+            testSession.setSessionNumber(1);
+            testSession.setOpponent("TestOpponent");
+            testSession.setYourTurn(true);
+            loadSessions(List.of(testSession));
+
         });
     }
 
@@ -133,5 +159,20 @@ public class ClientController {
         Platform.runLater(() -> {
             btn_login.setText("Registration Failed. Try again?");
         });
+    }
+
+    public void loadSessions(List<GameSession> sessions) {
+        Platform.runLater(() -> {
+            sessionList.getItems().clear();
+            for (GameSession session : sessions) {
+                String display =
+                        "session Nr: " + session.getSessionNumber() + "\n" +
+                                "Opponent: " + session.getOpponent() + "\n" +
+                                "ur turn: " + session.isYourTurn() + "\n";
+                sessionList.getItems().add(display);
+            }
+
+        });
+
     }
 }

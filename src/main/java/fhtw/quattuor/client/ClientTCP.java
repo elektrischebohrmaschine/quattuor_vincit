@@ -61,4 +61,12 @@ public class ClientTCP {
         m.setPassword(password);
         out.println(msgSer.toJson(m));
     }
+    public void requestAllSessions() {
+        NetMessage m = new NetMessage(NetType.GET_ALL_SESSIONS);
+        out.println(msgSer.toJson(m));
+    }public void createSession(String username) {
+        NetMessage m = new NetMessage(NetType.CREATE_SESSION);
+        m.setUsername(username);
+        out.println(msgSer.toJson(m));
+    }
 }

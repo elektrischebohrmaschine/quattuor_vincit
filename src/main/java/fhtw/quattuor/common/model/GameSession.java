@@ -16,7 +16,6 @@ public class GameSession {
         this.board = new Board(row, col);
     }
 
-
     public GameSession(String opponent, int sessionNumber, boolean yourTurn) {
         this.board = new Board(row, col);
         this.opponent = opponent;
@@ -25,6 +24,9 @@ public class GameSession {
         this.isFinished = false;
         this.moveCount = 0;
     }
+    public GameSession(Object o) {
+    }
+
 
     public Board getBoard() {
         return board;

@@ -16,7 +16,7 @@ public class ServerPlayerService {
             return;
         }
 
-        // Replace player in list if he exits
+        // Replace player in list if they exits
         for (Player p : players) {
             if (p.getUsername().equals(player.getUsername())) {
                 players.set(players.indexOf(p), player);
