@@ -40,10 +40,18 @@ public class Player {
         return gameSessions;
     }
 
-    public void addGameSession(GameSession session) {
+    public void updateGameSession(GameSession session) {
         if (gameSessions == null) {
             gameSessions = new ArrayList<>();
         }
+        for (GameSession s : gameSessions) {
+            if (s.getSessionNumber() == session.getSessionNumber()) {
+                gameSessions.set(gameSessions.indexOf(s), session);
+                return;
+            }
+        }
+
+        // Add GameSession to List if it does not exist yet
         gameSessions.add(session);
     }
 

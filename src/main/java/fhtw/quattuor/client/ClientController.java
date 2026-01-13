@@ -1,6 +1,7 @@
 package fhtw.quattuor.client;
 
 import fhtw.quattuor.common.model.GameSession;
+import fhtw.quattuor.common.model.Player;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -25,8 +26,6 @@ public class ClientController {
     @FXML
     private CheckBox check_synchronisation;
     @FXML
-    private Text txt_player;
-    @FXML
     private VBox boardContainer;
     @FXML
     private ColorPicker colorSelect;
@@ -43,7 +42,9 @@ public class ClientController {
     @FXML
     private MenuItem level3;
     @FXML
-    private ListView<String> sessionList;
+    private ListView<GameSession> sessionList;
+    @FXML
+    private Text txt_opponent;
 
 
     @FXML
@@ -53,9 +54,11 @@ public class ClientController {
         level2.setOnAction(e -> connectFourGrid.startLevel(2));
         level3.setOnAction(e -> connectFourGrid.startLevel(3));
 
-        connectFourGrid = new ClientConnectFourGrid();
+        connectFourGrid = new ClientConnectFourGrid(this);
         VBox gridNode = connectFourGrid.generateGrid();
         boardContainer.getChildren().add(gridNode);
+
+        connectFourGrid.startLevel(1);
 
         check_synchronisation.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -104,16 +107,20 @@ public class ClientController {
         clientTCP.userLogin(txt_username.getText().trim(), txt_password.getText().trim());
     }
 
-    public void callbackLoginSuccess() {
+    public void callbackLoginSuccess(Player player) {
         connected = true;
         Platform.runLater(() -> {
             btn_login.setText("We are logged in baybeeeeeeeee! (Logout)");
-            GameSession testSession = new GameSession();
+            clientTCP.setPlayer(player);
+            loadPausedSessionList(player.getGameSessions());
+
+            /*
+            GameSession testSession = new GameSession(6,7);
             testSession.setSessionNumber(1);
             testSession.setOpponent("TestOpponent");
             testSession.setYourTurn(true);
-            loadSessions(List.of(testSession));
-
+            loadPausedSessionList(List.of(testSession));
+            */
         });
     }
 
@@ -161,18 +168,29 @@ public class ClientController {
         });
     }
 
-    public void loadSessions(List<GameSession> sessions) {
+    public void loadPausedSessionList(List<GameSession> sessions) {
         Platform.runLater(() -> {
             sessionList.getItems().clear();
-            for (GameSession session : sessions) {
-                String display =
-                        "session Nr: " + session.getSessionNumber() + "\n" +
-                                "Opponent: " + session.getOpponent() + "\n" +
-                                "ur turn: " + session.isYourTurn() + "\n";
-                sessionList.getItems().add(display);
-            }
-
+            sessionList.getItems().setAll(sessions);
         });
 
+    }
+
+    @FXML
+    public void onPausedGamesClick() {
+        GameSession selectedSession = sessionList.getSelectionModel().getSelectedItem();
+        System.out.println("clicked on " + selectedSession);
+
+        connectFourGrid.loadGameSession(selectedSession);
+        txt_opponent.setText(selectedSession.getOpponent());
+    }
+
+    public void onMoveCommitted(GameSession gameSession) {
+        clientTCP.sessionUpdate(gameSession);
+    }
+
+    public void callbackSessionUpdate(GameSession gameSession) {
+        connectFourGrid.loadGameSession(gameSession);
+        txt_opponent.setText(gameSession.getOpponent());
     }
 }

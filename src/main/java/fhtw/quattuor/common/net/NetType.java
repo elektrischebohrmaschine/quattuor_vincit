@@ -16,6 +16,7 @@ public enum NetType {
     NOT_LOGGED_IN,
     GET_ALL_SESSIONS,
     CREATE_SESSION,
+    SESSION_UPDATE,
     FORBIDDEN,
     ERROR
 }

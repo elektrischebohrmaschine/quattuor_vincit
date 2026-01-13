@@ -1,8 +1,12 @@
 package fhtw.quattuor.client;
 
+import fhtw.quattuor.common.model.GameSession;
+import fhtw.quattuor.common.model.Player;
 import fhtw.quattuor.common.net.NetMessage;
 import fhtw.quattuor.common.net.NetType;
+import fhtw.quattuor.common.serialization.GameSessionSerializer;
 import fhtw.quattuor.common.serialization.NetMessageSerializer;
+import fhtw.quattuor.common.serialization.PlayerSerializer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +19,9 @@ import static javafx.application.Platform.exit;
 public class ClientTCP {
 
     private final ClientController clientController;
+    private final PlayerSerializer playerSerializer;
+    private final GameSessionSerializer gameSessionSerializer;
+    private Player player;
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
@@ -25,6 +32,8 @@ public class ClientTCP {
 
     public ClientTCP(ClientController clientController) {
         this.clientController = clientController;
+        this.playerSerializer = new PlayerSerializer();
+        this.gameSessionSerializer = new GameSessionSerializer();
 
         try {
             socket = new Socket(host, port);
@@ -64,9 +73,23 @@ public class ClientTCP {
     public void requestAllSessions() {
         NetMessage m = new NetMessage(NetType.GET_ALL_SESSIONS);
         out.println(msgSer.toJson(m));
-    }public void createSession(String username) {
+    }
+
+    public void createSession(String username) {
         NetMessage m = new NetMessage(NetType.CREATE_SESSION);
         m.setUsername(username);
+        m.setPayload(playerSerializer.serializePlayer(player));
         out.println(msgSer.toJson(m));
+    }
+
+    public void sessionUpdate(GameSession gameSession) {
+        NetMessage m = new NetMessage(NetType.SESSION_UPDATE);
+        m.setUsername(player.getUsername());
+        m.setPayload(gameSessionSerializer.serializeSession(gameSession));
+        out.println(msgSer.toJson(m));
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 }

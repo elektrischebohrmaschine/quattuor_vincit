@@ -6,10 +6,10 @@ public class SingleLevels {
 
     private Board board;
     private int maxMoves;
-    private int level_selected;
+    private int levelSelected;
 
     public SingleLevels(int level) {
-        level_selected = level;
+        levelSelected = level;
         switch (level) {
             case 1:
                 Level1();
@@ -80,7 +80,7 @@ public class SingleLevels {
     }
 
     public Board enemyTurn(Board board) {
-        switch (level_selected) {
+        switch (levelSelected) {
             case 1:
                 board.setCellStatus(5, 1, CellStatus.PLAYER2);
                 break;
@@ -115,5 +115,9 @@ public class SingleLevels {
 
     public void setMaxMoves(int maxMoves) {
         this.maxMoves = maxMoves;
+    }
+
+    public int getLevelSelected() {
+        return levelSelected;
     }
 }

@@ -1,7 +1,9 @@
 package fhtw.quattuor.client;
 
 import fhtw.quattuor.common.net.NetMessage;
+import fhtw.quattuor.common.serialization.GameSessionSerializer;
 import fhtw.quattuor.common.serialization.NetMessageSerializer;
+import fhtw.quattuor.common.serialization.PlayerSerializer;
 
 import java.io.BufferedReader;
 
@@ -10,6 +12,8 @@ public class ClientServerListener implements Runnable {
     private final BufferedReader in;
     private final NetMessageSerializer msgSer;
     private final ClientController clientController;
+    private final PlayerSerializer playerSer = new PlayerSerializer();
+    private final GameSessionSerializer gameSessionSer= new GameSessionSerializer();
 
     public ClientServerListener(BufferedReader in, NetMessageSerializer msgSer, ClientController clientController) {
         this.in = in;
@@ -36,7 +40,7 @@ public class ClientServerListener implements Runnable {
 
                 switch (msg.getType()) {
                     case LOGIN_SUCCESS:
-                        clientController.callbackLoginSuccess();
+                        clientController.callbackLoginSuccess(playerSer.deserializePlayer(msg.getPayload()));
                         break;
                     case LOGIN_FAIL_USERNAME:
                         clientController.callbackLoginFailureUsername();
@@ -52,6 +56,9 @@ public class ClientServerListener implements Runnable {
                         break;
                     case REGISTER_FAIL:
                         clientController.callbackRegisterFail();
+                        break;
+                    case SESSION_UPDATE:
+                        clientController.callbackSessionUpdate(gameSessionSer.deserializeSession(msg.getPayload()));
                         break;
                     case ERROR:
                         System.out.println("Received Error from Server: " + msg.getError());

@@ -1,8 +1,10 @@
 package fhtw.quattuor.server;
 
+import fhtw.quattuor.common.model.GameSession;
 import fhtw.quattuor.common.model.Player;
 import fhtw.quattuor.common.net.NetMessage;
 import fhtw.quattuor.common.net.NetType;
+import fhtw.quattuor.common.serialization.GameSessionSerializer;
 import fhtw.quattuor.common.serialization.NetMessageSerializer;
 import fhtw.quattuor.common.serialization.PlayerSerializer;
 
@@ -70,6 +72,7 @@ public class ServerMain {
 
         private final NetMessageSerializer msgSer = new NetMessageSerializer();
         private final PlayerSerializer playerSer = new PlayerSerializer();
+        private final GameSessionSerializer gameSessionSer = new GameSessionSerializer();
 
         private Player loggedInPlayer = null;
 
@@ -120,6 +123,9 @@ public class ServerMain {
                             case NetType.LOGOUT:
                                 handleLogout();
                                 break;
+                            case NetType.SESSION_UPDATE:
+                                handleSessionUpdate(msg);
+                                break;
                             default:
                                 sendError(NetType.ERROR, "Unknown message type: " + msg.getType());
                         }
@@ -138,6 +144,36 @@ public class ServerMain {
                 server.removeClients(this);
                 try { clientSocket.close(); } catch (IOException ignored) {}
             }
+        }
+
+        private void handleSessionUpdate(NetMessage msg) {
+            if (loggedInPlayer == null) {
+                sendError(NetType.NOT_LOGGED_IN, "Please LOGIN first");
+                return;
+            }
+            if (msg.getPayload() == null || msg.getPayload().isBlank()) {
+                sendError(NetType.ERROR, "payload missing");
+                return;
+            }
+
+            GameSession session = gameSessionSer.deserializeSession(msg.getPayload());
+            if (session == null) {
+                sendError(NetType.ERROR, "Error deserializing session");
+                return;
+            }
+
+            loggedInPlayer.updateGameSession(session);
+
+            // Write updated Session to the Opponent Player as well
+            Player opponent = playerService.findByUsername(session.getOpponent());
+            if (opponent == null) {
+                sendError(NetType.ERROR, "Error deserializing opponent");
+                return;
+            }
+            session.toggleTurn();
+            session.setOpponent(loggedInPlayer.getUsername());
+            opponent.updateGameSession(session);
+            System.out.println("Updated GameSession: ID: " + session.getSessionNumber());
         }
 
         private void handleLogout() {

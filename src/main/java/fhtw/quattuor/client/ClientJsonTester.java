@@ -11,8 +11,8 @@ import java.net.Socket;
 public class ClientJsonTester {
     public static void main(String[] args) {
         Player player = new Player("Max", "Password123");
-        GameSession session = new GameSession("Daniel", 1, true);
-        player.addGameSession(session);
+        GameSession session = new GameSession("Daniel", 1, true, 6, 7);
+        player.updateGameSession(session);
 
         PlayerSerializer playerSerializer = new PlayerSerializer();
         String json = playerSerializer.serializePlayer(player);

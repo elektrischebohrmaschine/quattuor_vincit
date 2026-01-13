@@ -19,7 +19,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Text?>
 
-<HBox prefHeight="628.0" prefWidth="838.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fhtw.quattuor.client.ClientController">
+<HBox prefHeight="628.0" prefWidth="838.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fhtw.quattuor.client.ClientController">
    <children>
       <VBox prefHeight="618.0" prefWidth="334.0">
          <children>
@@ -52,7 +52,7 @@
                   </Tab>
                   <Tab text="Paused Games">
                      <content>
-                        <ListView fx:id="sessionList" prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="sessionList" onMouseClicked="#onPausedGamesClick" prefHeight="200.0" prefWidth="200.0" />
                      </content></Tab>
                   <Tab text="Highscore" />
                </tabs>
@@ -72,7 +72,7 @@
                   <ToolBar prefHeight="40.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                     <items>
                         <Text fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Oponment: " />
-                        <Text fx:id="txt_player" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="insert username? " />
+                        <Text fx:id="txt_opponent" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="insert username? " />
                         <ColorPicker fx:id="colorSelect" editable="true" prefHeight="26.0" prefWidth="113.0" promptText="ze color u chose">
                            <value>
                               <Color red="0.31578946113586426" green="0.09473684430122375" blue="0.09473684430122375" />
