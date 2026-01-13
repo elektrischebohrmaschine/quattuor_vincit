@@ -1,5 +1,6 @@
 package fhtw.quattuor.server;
 
+import fhtw.quattuor.common.model.GameSession;
 import fhtw.quattuor.common.model.Player;
 import fhtw.quattuor.common.serialization.PlayerSerializer;
 
@@ -107,5 +108,18 @@ public class ServerPlayerService {
 
         players.add(new Player(username, password));
         return true;
+    }
+
+    public int getHighestSessionNumber() {
+        int highest = 0;
+        for (Player p : players) {
+            for (GameSession session : p.getGameSessions()) {
+                if (session.getSessionNumber() > highest) {
+                    highest = session.getSessionNumber();
+                }
+            }
+        }
+
+        return highest;
     }
 }

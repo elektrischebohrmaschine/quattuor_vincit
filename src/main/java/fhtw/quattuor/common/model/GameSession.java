@@ -85,6 +85,10 @@ public class GameSession {
         this.moveCount++;
     }
 
+    public Board flippedBoard() {
+        return board.flippedBoard();
+    }
+
     @Override
     public String toString() {
         return "session Nr: " + getSessionNumber() + "\n" +

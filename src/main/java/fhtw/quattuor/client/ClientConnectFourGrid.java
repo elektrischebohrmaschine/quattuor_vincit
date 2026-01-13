@@ -106,6 +106,7 @@ public class ClientConnectFourGrid {
             } else {
                 if (winner == 1 || winner == 2) {
                     showsWinner.setText("WINNER: " + winner);
+                    logic.getGameSession().setFinished(true);
                     disableButtons();
                 } else if (winner == 3) {
                     showsWinner.setText("its a draw");
@@ -174,12 +175,9 @@ public class ClientConnectFourGrid {
         setAllColours();
     }
 
-    public void setPlayerColors(boolean playerOne, String color) {
-        if (playerOne) {
-            playerOneColor = "-fx-background-color: " + color + ";";
-        } else  {
-            playerTwoColor = "-fx-background-color: " + color + ";";
-        }
+    public void setPlayerColors(String playerColor, String opponentColor) {
+        playerOneColor = "-fx-background-color: " + playerColor + ";";
+        playerTwoColor = "-fx-background-color: " + opponentColor + ";";
         setAllColours();
     }
 

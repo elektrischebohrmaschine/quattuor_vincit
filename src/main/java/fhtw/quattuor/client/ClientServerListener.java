@@ -52,13 +52,16 @@ public class ClientServerListener implements Runnable {
                         clientController.callbackLogoutSuccess();
                         break;
                     case REGISTER_SUCCESS:
-                        clientController.callbackRegisterSuccess();
+                        clientController.callbackRegisterSuccess(msg.getPayload());
                         break;
                     case REGISTER_FAIL:
                         clientController.callbackRegisterFail();
                         break;
                     case SESSION_UPDATE:
                         clientController.callbackSessionUpdate(gameSessionSer.deserializeSession(msg.getPayload()));
+                        break;
+                    case SET_ALL_SESSIONS:
+                        clientController.callbackSetAllSessions(msg.getPayload());
                         break;
                     case ONLINE_LIST:
                         clientController.callbackOnlineList(msg.getPayload());

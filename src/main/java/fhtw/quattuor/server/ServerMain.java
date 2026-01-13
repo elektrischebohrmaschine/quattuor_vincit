@@ -144,12 +144,17 @@ public class ServerMain {
                             case NetType.HIGHSCORE_REQUEST:
                                 handleHighscoreRequest();
                                 break;
-
                             case NetType.LOGOUT:
                                 handleLogout();
                                 break;
+                            case NetType.CREATE_SESSION:
+                                handleSessionCreation(msg);
+                                break;
                             case NetType.SESSION_UPDATE:
                                 handleSessionUpdate(msg);
+                                break;
+                            case NetType.GET_ALL_SESSIONS:
+                                handleSessionGetAll(msg);
                                 break;
                             default:
                                 sendError(NetType.ERROR, "Unknown message type: " + msg.getType());
@@ -176,6 +181,72 @@ public class ServerMain {
             }
         }
 
+        private void handleSessionGetAll(NetMessage msg) {
+            if (loggedInPlayer == null) {
+                sendError(NetType.NOT_LOGGED_IN, "Please LOGIN first");
+                return;
+            }
+            if (msg.getPayload() == null || msg.getPayload().isBlank()) {
+                sendError(NetType.ERROR, "payload missing");
+                return;
+            }
+
+            NetMessage res = new NetMessage(NetType.SET_ALL_SESSIONS);
+            res.setUsername(loggedInPlayer.getUsername());
+            res.setPayload(playerSer.serializePlayer(loggedInPlayer));
+            out.println(msgSer.toJson(res));
+        }
+
+        private void handleSessionCreation(NetMessage msg) {
+            if (loggedInPlayer == null) {
+                sendError(NetType.NOT_LOGGED_IN, "Please LOGIN first");
+                return;
+            }
+            if (msg.getPayload() == null || msg.getPayload().isBlank()) {
+                sendError(NetType.ERROR, "payload missing");
+                return;
+            }
+
+            Player opponent = playerService.findByUsername(msg.getPayload());
+            if (opponent == null) {
+                sendError(NetType.ERROR, "Opponent not found");
+                return;
+            }
+
+            // Check if a session between two players already exists
+            GameSession session = null;
+            session = loggedInPlayer.getGameSessionByOpponent(opponent.getUsername());
+            if (session != null) {
+                if (session.isFinished()) {
+                    // Delete finished session
+                    loggedInPlayer.removeGameSessionByNumber(session.getSessionNumber());
+                    opponent.removeGameSessionByNumber(session.getSessionNumber());
+                    session = null;
+                } else {
+                    // Send ongoing session
+                    NetMessage res = new NetMessage(NetType.SESSION_UPDATE);
+                    res.setUsername(loggedInPlayer.getUsername());
+                    res.setPayload(gameSessionSer.serializeSession(session));
+                    out.println(msgSer.toJson(res));
+                    return;
+                }
+            }
+
+            int sessionNumber = playerService.getHighestSessionNumber() + 1;
+            session = new GameSession(opponent.getUsername(), sessionNumber, true, 6, 7);
+            loggedInPlayer.updateGameSession(session);
+
+            GameSession oppSession = new GameSession(loggedInPlayer.getUsername(), sessionNumber, false, 6, 7);
+            opponent.updateGameSession(oppSession);
+
+            playerService.safePlayersToDisk();
+
+            NetMessage res = new NetMessage(NetType.SESSION_UPDATE);
+            res.setUsername(loggedInPlayer.getUsername());
+            res.setPayload(gameSessionSer.serializeSession(session));
+            out.println(msgSer.toJson(res));
+        }
+
         private void handleSessionUpdate(NetMessage msg) {
             if (loggedInPlayer == null) {
                 sendError(NetType.NOT_LOGGED_IN, "Please LOGIN first");
@@ -200,9 +271,13 @@ public class ServerMain {
                 sendError(NetType.ERROR, "Error deserializing opponent");
                 return;
             }
-            session.toggleTurn();
-            session.setOpponent(loggedInPlayer.getUsername());
-            opponent.updateGameSession(session);
+            GameSession oppSession = opponent.getGameSessionByNumber(session.getSessionNumber());
+            oppSession.toggleTurn();
+            oppSession.setBoard(session.flippedBoard());
+            opponent.updateGameSession(oppSession);
+
+            playerService.safePlayersToDisk();
+
             System.out.println("Updated GameSession: ID: " + session.getSessionNumber());
         }
 
@@ -269,6 +344,7 @@ public class ServerMain {
             NetMessage res = new NetMessage(NetType.REGISTER_SUCCESS);
             res.setUsername(msg.getUsername());
             res.setPassword(msg.getPassword());
+            res.setPayload(playerSer.serializePlayer(loggedInPlayer));
             out.println(msgSer.toJson(res));
 
             if (loggedInPlayer == null) {
@@ -322,7 +398,6 @@ public class ServerMain {
         }
 
         private void handleHighscoreRequest() {
-
             List<Player> sorted = new ArrayList<>(playerService.getPlayers());
             sorted.sort((a, b) -> Integer.compare(b.getHighscore(), a.getHighscore()));
 
@@ -334,9 +409,6 @@ public class ServerMain {
             res.setPayload(new PlayerSerializer().serializePlayers(top));
             out.println(msgSer.toJson(res));
         }
-
-
-
 
         private void sendError(NetType code, String text) {
             NetMessage res = new NetMessage(code);

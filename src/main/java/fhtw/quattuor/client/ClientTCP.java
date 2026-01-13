@@ -94,6 +94,10 @@ public class ClientTCP {
         this.player = player;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     public void updateMyColors(String primaryHex, String fallbackHex) {
         if (player == null) return;
 
@@ -113,4 +117,11 @@ public class ClientTCP {
         out.println(msgSer.toJson(m));
     }
 
+    public void startSession(String opponentName) {
+        NetMessage m = new NetMessage(NetType.CREATE_SESSION);
+        m.setUsername(player.getUsername());
+        m.setPassword(player.getPassword());
+        m.setPayload(opponentName);
+        out.println(msgSer.toJson(m));
+    }
 }

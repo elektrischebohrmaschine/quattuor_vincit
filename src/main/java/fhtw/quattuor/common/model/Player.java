@@ -46,28 +46,12 @@ public class Player {
         return opponentColor;
     }
 
-    public void increaseHighscore() {
-        highscore++;
-    }
-
-
     public List<GameSession> getGameSessions() {
         return gameSessions;
     }
 
-    public void updateGameSession(GameSession session) {
-        if (gameSessions == null) {
-            gameSessions = new ArrayList<>();
-        }
-        for (GameSession s : gameSessions) {
-            if (s.getSessionNumber() == session.getSessionNumber()) {
-                gameSessions.set(gameSessions.indexOf(s), session);
-                return;
-            }
-        }
-
-        // Add GameSession to List if it does not exist yet
-        gameSessions.add(session);
+    public void increaseHighscore() {
+        highscore++;
     }
 
     public void setUsername(String username) {
@@ -94,4 +78,44 @@ public class Player {
         this.gameSessions = gameSessions;
     }
 
+    public void updateGameSession(GameSession session) {
+        if (gameSessions == null) {
+            gameSessions = new ArrayList<>();
+        }
+        for (GameSession s : gameSessions) {
+            if (s.getSessionNumber() == session.getSessionNumber()) {
+                gameSessions.set(gameSessions.indexOf(s), session);
+                return;
+            }
+        }
+
+        // Add GameSession to List if it does not exist yet
+        gameSessions.add(session);
+    }
+
+    public GameSession getGameSessionByOpponent(String opponentName) {
+        for (GameSession s : gameSessions) {
+            if (s.getOpponent().equals(opponentName)) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public GameSession getGameSessionByNumber(int sessionNumber) {
+        for (GameSession s : gameSessions) {
+            if (s.getSessionNumber() == sessionNumber) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public void removeGameSessionByNumber(int sessionNumber) {
+        for (GameSession s : gameSessions) {
+            if (s.getSessionNumber() == sessionNumber) {
+                gameSessions.remove(s);
+            }
+        }
+    }
 }

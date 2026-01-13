@@ -25,6 +25,7 @@ public class ClientController {
     ClientTCP clientTCP = new ClientTCP(this);
 
     private final ObservableList<String> highscoreItems = FXCollections.observableArrayList();
+    private final ObservableList<String> onlineItems = FXCollections.observableArrayList();
     private final PlayerSerializer playerSer = new PlayerSerializer();
 
     @FXML
@@ -52,12 +53,13 @@ public class ClientController {
     @FXML
     private MenuItem level3;
     @FXML
-    private ListView<GameSession> sessionList;
-    @FXML
     private Text txt_opponent;
     @FXML
+    private ListView<GameSession> sessionList;
+    @FXML
     private ListView<String> list_highscore;
-
+    @FXML
+    private ListView<String> list_online;
 
 
     @FXML
@@ -106,9 +108,9 @@ public class ClientController {
             });
 
         }
-        if (list_highscore != null) list_highscore.setItems(highscoreItems);
-
-
+        if (list_highscore != null) {
+            list_highscore.setItems(highscoreItems);
+        }
 
         check_synchronisation.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -157,28 +159,12 @@ public class ClientController {
         clientTCP.userLogin(txt_username.getText().trim(), txt_password.getText().trim());
     }
 
-    @FXML
-    private ListView<String> list_online;
-
-    private final ObservableList<String> onlineItems = FXCollections.observableArrayList();
-    private final ObjectMapper om = new ObjectMapper();
-
 
     public void callbackLoginSuccess(String playerJson) {
         connected = true;
         Platform.runLater(() -> {
-           btn_login.setText("We are logged in baybeeeeeeeee! (Logout)");
-
-            try {
-                Player p = new PlayerSerializer().deserializePlayer(playerJson);
-                if (p != null) {
-                    playerColor.setValue(javafx.scene.paint.Color.web(p.getPlayerColor()));
-                    opponentColor.setValue(javafx.scene.paint.Color.web(p.getOpponentColor()));
-                    clientTCP.setPlayer(p);
-                    loadPausedSessionList(p.getGameSessions());
-                }
-            } catch (Exception ignored) {}
-
+            btn_login.setText("We are logged in baybeeeeeeeee! (Logout)");
+            setPlayer(playerJson);
             clientTCP.requestHighscores();
         });
     }
@@ -214,11 +200,25 @@ public class ClientController {
         });
     }
 
-    public void callbackRegisterSuccess() {
+    public void callbackRegisterSuccess(String playerJson) {
         connected = true;
         Platform.runLater(() -> {
             btn_login.setText("Register Success! Logout?");
+            setPlayer(playerJson);
         });
+    }
+
+    private void setPlayer(String playerJson) {
+        try {
+            Player p = new PlayerSerializer().deserializePlayer(playerJson);
+            if (p != null) {
+                playerColor.setValue(javafx.scene.paint.Color.web(p.getPlayerColor()));
+                opponentColor.setValue(javafx.scene.paint.Color.web(p.getOpponentColor()));
+                clientTCP.setPlayer(p);
+                loadPausedSessionList(p.getGameSessions());
+                connectFourGrid.setPlayerColors(p.getPlayerColor(), p.getOpponentColor());
+            }
+        } catch (Exception ignored) {}
     }
 
     public void callbackRegisterFail() {
@@ -250,12 +250,15 @@ public class ClientController {
     }
 
     public void callbackSessionUpdate(GameSession gameSession) {
-        connectFourGrid.loadGameSession(gameSession);
-        txt_opponent.setText(gameSession.getOpponent());
+        Platform.runLater(() -> {
+            connectFourGrid.loadGameSession(gameSession);
+            txt_opponent.setText(gameSession.getOpponent());
+        });
     }
 
     public void callbackOnlineList(String jsonPayload) {
         Platform.runLater(() -> {
+            ObjectMapper om = new ObjectMapper();
             try {
                 String[] arr = om.readValue(jsonPayload, String[].class);
                 onlineItems.setAll(arr);
@@ -267,6 +270,9 @@ public class ClientController {
     }
 
     public void callbackPresenceUpdate(String username, String status) {
+        if (clientTCP.getPlayer() == null) {
+            return;
+        }
         Platform.runLater(() -> {
             boolean online = "ONLINE".equalsIgnoreCase(status);
 
@@ -297,7 +303,6 @@ public class ClientController {
         });
     }
 
-
     private static String toHex(javafx.scene.paint.Color c) {
         int r = (int)Math.round(c.getRed() * 255);
         int g = (int)Math.round(c.getGreen() * 255);
@@ -310,5 +315,22 @@ public class ClientController {
         String playerCl = toHex(playerColor.getValue());
         String opponentCl = toHex(opponentColor.getValue());
         clientTCP.updateMyColors(playerCl, opponentCl);
+        connectFourGrid.setPlayerColors(playerCl, opponentCl);
+    }
+
+    @FXML
+    public void onOnlinePlayersClick() {
+        String opponentName = list_online.getSelectionModel().getSelectedItem();
+        if (clientTCP.getPlayer() != null && clientTCP.getPlayer().getUsername().equals(opponentName)) {
+            connectFourGrid.startLevel(1);
+        } else {
+            clientTCP.startSession(opponentName);
+        }
+    }
+
+    public void callbackSetAllSessions(String payload) {
+        Platform.runLater(() -> {
+            setPlayer(payload);
+        });
     }
 }

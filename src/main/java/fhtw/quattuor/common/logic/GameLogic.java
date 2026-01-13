@@ -24,7 +24,7 @@ public class GameLogic {
             return valid;
         }
 
-        if (x == gameSession.getBoard().getHeight() - 1) {
+        if (x == gameSession.getBoard().boardHeight() - 1) {
         } else if (gameSession.getBoard().getCellStatus(x + 1, y) == CellStatus.EMPTY) {
             return valid;
         }
@@ -65,10 +65,10 @@ public class GameLogic {
 
 
         // vertikal
-        for (int col = 0; col < board.getWidth(); col++) {
+        for (int col = 0; col < board.boardWidth(); col++) {
             int streak_p1 = 0;
             int streak_p2 = 0;
-            for (int row = 0; row < board.getHeight(); row++) {
+            for (int row = 0; row < board.boardHeight(); row++) {
 
                 CellStatus status = board.getCellStatus(row, col);
 
@@ -92,10 +92,10 @@ public class GameLogic {
         }
 
         // horizontal
-        for (int row = 0; row < board.getHeight(); row++) {
+        for (int row = 0; row < board.boardHeight(); row++) {
             int streak_p1 = 0;
             int streak_p2 = 0;
-            for (int col = 0; col < board.getWidth(); col++) {
+            for (int col = 0; col < board.boardWidth(); col++) {
                 CellStatus status = board.getCellStatus(row, col);
 
                 if (status == CellStatus.PLAYER1) {
@@ -118,8 +118,8 @@ public class GameLogic {
         }
 
         // diagonal (links-> rechts)
-        for (int row = 0; row < board.getHeight() - 3; row++) {
-            for (int col = 0; col < board.getWidth() - 3; col++) {
+        for (int row = 0; row < board.boardHeight() - 3; row++) {
+            for (int col = 0; col < board.boardWidth() - 3; col++) {
 
                 int streak_p1 = 0;
                 int streak_p2 = 0;
@@ -142,8 +142,8 @@ public class GameLogic {
         }
 
         // diagonal (rechts -> links)
-        for (int row = 3; row < board.getHeight(); row++) {
-            for (int col = 0; col < board.getWidth() - 3; col++) {
+        for (int row = 3; row < board.boardHeight(); row++) {
+            for (int col = 0; col < board.boardWidth() - 3; col++) {
 
                 int streak_p1 = 0;
                 int streak_p2 = 0;
@@ -167,8 +167,8 @@ public class GameLogic {
         }
 
         //draw
-        for (int row = 0; row < board.getHeight(); ) {
-            for (int col = 0; col < board.getWidth(); col++) {
+        for (int row = 0; row < board.boardHeight(); ) {
+            for (int col = 0; col < board.boardWidth(); col++) {
                 if (board.getCellStatus(row, col) == CellStatus.EMPTY) {
                     return continues;
                 }
@@ -179,7 +179,11 @@ public class GameLogic {
     }
 
     public int getWinner() {
-        return checkWinCondition(gameSession.getBoard());
+        int result = checkWinCondition(gameSession.getBoard());
+        if (result != 0) {
+            gameSession.setFinished(true);
+        }
+        return result;
     }
 
     public void LevelLaden(SingleLevels level) {

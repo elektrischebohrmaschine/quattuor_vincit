@@ -12,6 +12,11 @@ public class ServerGameSessionService {
 
     public ServerGameSessionService(ServerPlayerService playerService) {
         this.playerService = playerService;
+        for (Player player : playerService.getPlayers()) {
+            for(GameSession session : player.getGameSessions()) {
+                sessions.add(session);
+            }
+        }
     }
 
     public GameSession getSession(int sessionNumber) {
