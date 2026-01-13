@@ -62,6 +62,7 @@ public class ClientTCP {
     public void userLogout() {
         NetMessage m = new NetMessage(NetType.LOGOUT);
         out.println(msgSer.toJson(m));
+        player = null;
     }
 
     public void userRegister(String username, String password) {
@@ -92,4 +93,24 @@ public class ClientTCP {
     public void setPlayer(Player player) {
         this.player = player;
     }
+
+    public void updateMyColors(String primaryHex, String fallbackHex) {
+        if (player == null) return;
+
+        player.setPlayerColor(primaryHex);
+        player.setOpponentColor(fallbackHex);
+
+        NetMessage m = new NetMessage(NetType.PLAYER_UPDATE);
+        m.setUsername(player.getUsername());
+        m.setPassword(player.getPassword());
+        m.setPayload(playerSerializer.serializePlayer(player));
+
+        out.println(msgSer.toJson(m));
+    }
+
+    public void requestHighscores() {
+        NetMessage m = new NetMessage(NetType.HIGHSCORE_REQUEST);
+        out.println(msgSer.toJson(m));
+    }
+
 }

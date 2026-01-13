@@ -40,7 +40,7 @@ public class ClientServerListener implements Runnable {
 
                 switch (msg.getType()) {
                     case LOGIN_SUCCESS:
-                        clientController.callbackLoginSuccess(playerSer.deserializePlayer(msg.getPayload()));
+                        clientController.callbackLoginSuccess(msg.getPayload());
                         break;
                     case LOGIN_FAIL_USERNAME:
                         clientController.callbackLoginFailureUsername();
@@ -59,6 +59,15 @@ public class ClientServerListener implements Runnable {
                         break;
                     case SESSION_UPDATE:
                         clientController.callbackSessionUpdate(gameSessionSer.deserializeSession(msg.getPayload()));
+                        break;
+                    case ONLINE_LIST:
+                        clientController.callbackOnlineList(msg.getPayload());
+                        break;
+                    case PRESENCE_UPDATE:
+                        clientController.callbackPresenceUpdate(msg.getUsername(), msg.getPayload());
+                        break;
+                    case HIGHSCORE_LIST:
+                        clientController.callbackHighscoreList(msg.getPayload());
                         break;
                     case ERROR:
                         System.out.println("Received Error from Server: " + msg.getError());

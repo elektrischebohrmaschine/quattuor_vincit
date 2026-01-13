@@ -47,14 +47,18 @@
                <tabs>
                   <Tab text="Friendlist">
                      <content>
-                        <ListView prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="list_online" prefHeight="200.0" prefWidth="200.0"/>
                      </content>
                   </Tab>
                   <Tab text="Paused Games">
                      <content>
                         <ListView fx:id="sessionList" onMouseClicked="#onPausedGamesClick" prefHeight="200.0" prefWidth="200.0" />
                      </content></Tab>
-                  <Tab text="Highscore" />
+                  <Tab text="Highscore">
+                  <content>
+                     <ListView fx:id="list_highscore" />
+                  </content>
+                  </Tab>
                </tabs>
                <VBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -71,13 +75,20 @@
                <children>
                   <ToolBar prefHeight="40.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                     <items>
-                        <Text fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Oponment: " />
+                        <Text fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Opponent: " />
                         <Text fx:id="txt_opponent" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="insert username? " />
-                        <ColorPicker fx:id="colorSelect" editable="true" prefHeight="26.0" prefWidth="113.0" promptText="ze color u chose">
-                           <value>
-                              <Color red="0.31578946113586426" green="0.09473684430122375" blue="0.09473684430122375" />
-                           </value>
-                        </ColorPicker>
+                       <Text text="Player:" />
+                       <ColorPicker fx:id="playerColor" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Player">
+                          <value>
+                             <Color red="1.0" green="0.8352941" blue="0.0" />
+                          </value>
+                       </ColorPicker>
+                       <Text text="Opponent:" />
+                       <ColorPicker fx:id="opponentColor" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Opponent">
+                          <value>
+                             <Color red="1.0" green="0.0" blue="0.0" />
+                          </value>
+                       </ColorPicker>
                         <ToggleButton fx:id="btn_turn" mnemonicParsing="false" prefHeight="26.0" prefWidth="94.0" text="your turn" textAlignment="CENTER">
                            <opaqueInsets>
                               <Insets />
