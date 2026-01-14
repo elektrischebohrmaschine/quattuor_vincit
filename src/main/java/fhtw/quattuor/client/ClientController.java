@@ -78,6 +78,7 @@ public class ClientController {
         boardContainer.getChildren().add(gridNode);
 
         connectFourGrid.startLevel(1);
+        txt_opponent.setText(connectFourGrid.getOpponentName());
 
         if (list_online != null) {
             list_online.setItems(onlineItems);
@@ -238,6 +239,9 @@ public class ClientController {
 
     @FXML
     public void onPausedGamesClick() {
+        if (!connected) {
+            return;
+        }
         GameSession selectedSession = sessionList.getSelectionModel().getSelectedItem();
         System.out.println("clicked on " + selectedSession);
 
@@ -247,12 +251,28 @@ public class ClientController {
 
     public void onMoveCommitted(GameSession gameSession) {
         clientTCP.sessionUpdate(gameSession);
+        toggleTurnButton(gameSession);
     }
 
     public void callbackSessionUpdate(GameSession gameSession) {
         Platform.runLater(() -> {
             connectFourGrid.loadGameSession(gameSession);
             txt_opponent.setText(gameSession.getOpponent());
+            toggleTurnButton(gameSession);
+        });
+    }
+
+    public void toggleTurnButton(GameSession gameSession) {
+        Platform.runLater(() -> {
+            if (gameSession.isYourTurn()) {
+                btn_turn.setSelected(true);
+                btn_turn.setText("It's your turn");
+                btn_turn.setDisable(true);
+            } else {
+                btn_turn.setSelected(false);
+                btn_turn.setText("Update Board");
+                btn_turn.setDisable(false);
+            }
         });
     }
 
@@ -311,7 +331,9 @@ public class ClientController {
     }
 
     private void sendMyColors() {
-        if (!connected) return;
+        if (!connected) {
+            return;
+        }
         String playerCl = toHex(playerColor.getValue());
         String opponentCl = toHex(opponentColor.getValue());
         clientTCP.updateMyColors(playerCl, opponentCl);
@@ -320,6 +342,9 @@ public class ClientController {
 
     @FXML
     public void onOnlinePlayersClick() {
+        if (!connected) {
+            return;
+        }
         String opponentName = list_online.getSelectionModel().getSelectedItem();
         if (clientTCP.getPlayer() != null && clientTCP.getPlayer().getUsername().equals(opponentName)) {
             connectFourGrid.startLevel(1);
@@ -332,5 +357,17 @@ public class ClientController {
         Platform.runLater(() -> {
             setPlayer(payload);
         });
+    }
+
+    public void setOpponentText(String opponentName) {
+        Platform.runLater(() -> {
+            txt_opponent.setText(opponentName);
+        });
+    }
+
+    @FXML
+    public void onTurnButtonClick() {
+        clientTCP.sessionUpdateRequest(connectFourGrid.getGameSessionNumber());
+        System.out.println("Turn button clicked");
     }
 }

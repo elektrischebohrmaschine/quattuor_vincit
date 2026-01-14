@@ -89,7 +89,7 @@
                              <Color red="1.0" green="0.0" blue="0.0" />
                           </value>
                        </ColorPicker>
-                        <ToggleButton fx:id="btn_turn" mnemonicParsing="false" prefHeight="26.0" prefWidth="94.0" text="your turn" textAlignment="CENTER">
+                        <ToggleButton fx:id="btn_turn" mnemonicParsing="false" onAction="#onTurnButtonClick" prefHeight="26.0" prefWidth="94.0" text="your turn" textAlignment="CENTER">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>

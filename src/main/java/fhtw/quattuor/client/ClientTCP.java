@@ -76,13 +76,6 @@ public class ClientTCP {
         out.println(msgSer.toJson(m));
     }
 
-    public void createSession(String username) {
-        NetMessage m = new NetMessage(NetType.CREATE_SESSION);
-        m.setUsername(username);
-        m.setPayload(playerSerializer.serializePlayer(player));
-        out.println(msgSer.toJson(m));
-    }
-
     public void sessionUpdate(GameSession gameSession) {
         NetMessage m = new NetMessage(NetType.SESSION_UPDATE);
         m.setUsername(player.getUsername());
@@ -122,6 +115,14 @@ public class ClientTCP {
         m.setUsername(player.getUsername());
         m.setPassword(player.getPassword());
         m.setPayload(opponentName);
+        out.println(msgSer.toJson(m));
+    }
+
+    public void sessionUpdateRequest(int sessionNumber) {
+        NetMessage m = new NetMessage(NetType.SESSION_UPDATE_REQUEST);
+        m.setUsername(player.getUsername());
+        m.setPassword(player.getPassword());
+        m.setPayload(Integer.toString(sessionNumber));
         out.println(msgSer.toJson(m));
     }
 }

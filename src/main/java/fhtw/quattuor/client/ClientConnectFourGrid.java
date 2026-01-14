@@ -20,6 +20,8 @@ public class ClientConnectFourGrid {
     private GameLogic logic = new GameLogic(GRID_HEIGHT_X, GRID_WIDTH_Y);
     private TextField showsWinner = new TextField();
     final private String ONGOING_GAME_TEXT  = "WHO IS WINNING?";
+    final private String WIN_TEXT = "The Winner is: ";
+    final private String DRAW_TEXT = "It's a draw!";
 
     final private int BTN_SIZE = 50;
     final private int BTN_SPACING = 2;
@@ -87,6 +89,7 @@ public class ClientConnectFourGrid {
 
             int winner = logic.getWinner();
             if (logic.getLevelMode()) {
+                // Singleplayer Level Logic
                 if (winner == 1) {
                     showsWinner.setText("Yaaay you won");
                     disableButtons();
@@ -104,17 +107,27 @@ public class ClientConnectFourGrid {
                     }
                 }
             } else {
-                if (winner == 1 || winner == 2) {
-                    showsWinner.setText("WINNER: " + winner);
+                // Multiplayer Logic
+                if (winner != 0) {
+                    setWinnerText(winner);
                     logic.getGameSession().setFinished(true);
-                    disableButtons();
-                } else if (winner == 3) {
-                    showsWinner.setText("its a draw");
-                    disableButtons();
                 }
 
                 controller.onMoveCommitted(logic.getGameSession());
+                disableButtons();
             }
+        }
+    }
+
+    private void setWinnerText(int winner) {
+        if (winner == 1 || winner == 2) {
+            if (winner == 1) {
+                showsWinner.setText(WIN_TEXT + "You!");
+            } else {
+                showsWinner.setText(WIN_TEXT + getOpponentName());
+            }
+        } else if (winner == 3) {
+            showsWinner.setText(DRAW_TEXT);
         }
     }
 
@@ -170,6 +183,7 @@ public class ClientConnectFourGrid {
         SingleLevels lvl = new SingleLevels(level);
 
         logic.LevelLaden(lvl);
+        controller.setOpponentText(getOpponentName());
         showsWinner.setText("Moves remaining: " + logic.getMaxMoves());
 
         setAllColours();
@@ -183,6 +197,15 @@ public class ClientConnectFourGrid {
 
     public void loadGameSession(GameSession gameSession) {
         logic.setGameSession(gameSession);
+        if (gameSession.isFinished()) {
+            setWinnerText(logic.getWinner());
+            disableButtons();
+            setAllColours();
+            return;
+        }
+
+        showsWinner.setText("Now playing against: " + gameSession.getOpponent() + " (Session ID: " + gameSession.getSessionNumber() + ")");
+
         if (logic.isPlayer_one_turn()) {
             resetButtons();
         } else {
@@ -190,5 +213,13 @@ public class ClientConnectFourGrid {
         }
 
         setAllColours();
+    }
+
+    public String getOpponentName() {
+        return logic.getGameSession().getOpponent();
+    }
+
+    public int getGameSessionNumber() {
+        return logic.getGameSession().getSessionNumber();
     }
 }

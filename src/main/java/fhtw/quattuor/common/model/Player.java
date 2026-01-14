@@ -112,10 +112,6 @@ public class Player {
     }
 
     public void removeGameSessionByNumber(int sessionNumber) {
-        for (GameSession s : gameSessions) {
-            if (s.getSessionNumber() == sessionNumber) {
-                gameSessions.remove(s);
-            }
-        }
+        gameSessions.removeIf(gameSession -> gameSession.getSessionNumber() == sessionNumber);
     }
 }

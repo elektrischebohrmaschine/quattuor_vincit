@@ -156,6 +156,9 @@ public class ServerMain {
                             case NetType.GET_ALL_SESSIONS:
                                 handleSessionGetAll(msg);
                                 break;
+                            case NetType.SESSION_UPDATE_REQUEST:
+                                handleSessionUpdateRequest(msg);
+                                break;
                             default:
                                 sendError(NetType.ERROR, "Unknown message type: " + msg.getType());
                         }
@@ -179,6 +182,28 @@ public class ServerMain {
                 server.removeClients(this);
                 try { clientSocket.close(); } catch (IOException ignored) {}
             }
+        }
+
+        private void handleSessionUpdateRequest(NetMessage msg) {
+            if (loggedInPlayer == null) {
+                sendError(NetType.NOT_LOGGED_IN, "Please LOGIN first");
+                return;
+            }
+            if (msg.getPayload() == null || msg.getPayload().isBlank()) {
+                sendError(NetType.ERROR, "payload missing");
+                return;
+            }
+
+            GameSession session = loggedInPlayer.getGameSessionByNumber(Integer.parseInt(msg.getPayload()));
+            if (session == null) {
+                sendError(NetType.ERROR, "Invalid session number");
+                return;
+            }
+
+            NetMessage res = new NetMessage(NetType.SESSION_UPDATE);
+            res.setUsername(loggedInPlayer.getUsername());
+            res.setPayload(gameSessionSer.serializeSession(session));
+            out.println(msgSer.toJson(res));
         }
 
         private void handleSessionGetAll(NetMessage msg) {
@@ -219,8 +244,9 @@ public class ServerMain {
             if (session != null) {
                 if (session.isFinished()) {
                     // Delete finished session
-                    loggedInPlayer.removeGameSessionByNumber(session.getSessionNumber());
-                    opponent.removeGameSessionByNumber(session.getSessionNumber());
+                    int sessionNumber = session.getSessionNumber();
+                    loggedInPlayer.removeGameSessionByNumber(sessionNumber);
+                    opponent.removeGameSessionByNumber(sessionNumber);
                     session = null;
                 } else {
                     // Send ongoing session
@@ -239,6 +265,8 @@ public class ServerMain {
             GameSession oppSession = new GameSession(loggedInPlayer.getUsername(), sessionNumber, false, 6, 7);
             opponent.updateGameSession(oppSession);
 
+            playerService.registerOrUpdate(loggedInPlayer);
+            playerService.registerOrUpdate(opponent);
             playerService.safePlayersToDisk();
 
             NetMessage res = new NetMessage(NetType.SESSION_UPDATE);
@@ -274,7 +302,13 @@ public class ServerMain {
             GameSession oppSession = opponent.getGameSessionByNumber(session.getSessionNumber());
             oppSession.toggleTurn();
             oppSession.setBoard(session.flippedBoard());
+            if (session.isFinished()) {
+                oppSession.setFinished(true);
+            }
             opponent.updateGameSession(oppSession);
+
+            playerService.registerOrUpdate(opponent);
+            playerService.registerOrUpdate(loggedInPlayer);
 
             playerService.safePlayersToDisk();
 
