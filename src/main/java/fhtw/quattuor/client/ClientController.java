@@ -355,9 +355,9 @@ public class ClientController {
         }
     }
 
-    public void callbackSetAllSessions(String payload) {
+    public void callbackSetAllSessions(String playerJson) {
         Platform.runLater(() -> {
-            setPlayer(payload);
+            setPlayer(playerJson);
         });
     }
 
