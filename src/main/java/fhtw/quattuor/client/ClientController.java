@@ -245,8 +245,7 @@ public class ClientController {
         GameSession selectedSession = sessionList.getSelectionModel().getSelectedItem();
         System.out.println("clicked on " + selectedSession);
 
-        connectFourGrid.loadGameSession(selectedSession);
-        txt_opponent.setText(selectedSession.getOpponent());
+        clientTCP.sessionUpdateRequest(selectedSession.getSessionNumber());
     }
 
     public void onMoveCommitted(GameSession gameSession) {
@@ -255,6 +254,9 @@ public class ClientController {
     }
 
     public void callbackSessionUpdate(GameSession gameSession) {
+        if (gameSession == null) {
+            System.err.println("Game Session Update failed: null GameSession");
+        }
         Platform.runLater(() -> {
             connectFourGrid.loadGameSession(gameSession);
             txt_opponent.setText(gameSession.getOpponent());
@@ -369,5 +371,13 @@ public class ClientController {
     public void onTurnButtonClick() {
         clientTCP.sessionUpdateRequest(connectFourGrid.getGameSessionNumber());
         System.out.println("Turn button clicked");
+    }
+
+    @FXML
+    public void onPausedGamesTabClick() {
+        if (!connected) {
+            return;
+        }
+        clientTCP.requestAllSessions();
     }
 }

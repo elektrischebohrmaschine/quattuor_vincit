@@ -184,6 +184,7 @@ public class ClientConnectFourGrid {
 
         logic.LevelLaden(lvl);
         controller.setOpponentText(getOpponentName());
+        controller.toggleTurnButton(logic.getGameSession());
         showsWinner.setText("Moves remaining: " + logic.getMaxMoves());
 
         setAllColours();

@@ -154,7 +154,7 @@ public class ServerMain {
                                 handleSessionUpdate(msg);
                                 break;
                             case NetType.GET_ALL_SESSIONS:
-                                handleSessionGetAll(msg);
+                                handleSessionGetAll();
                                 break;
                             case NetType.SESSION_UPDATE_REQUEST:
                                 handleSessionUpdateRequest(msg);
@@ -206,13 +206,9 @@ public class ServerMain {
             out.println(msgSer.toJson(res));
         }
 
-        private void handleSessionGetAll(NetMessage msg) {
+        private void handleSessionGetAll() {
             if (loggedInPlayer == null) {
                 sendError(NetType.NOT_LOGGED_IN, "Please LOGIN first");
-                return;
-            }
-            if (msg.getPayload() == null || msg.getPayload().isBlank()) {
-                sendError(NetType.ERROR, "payload missing");
                 return;
             }
 
@@ -305,6 +301,7 @@ public class ServerMain {
             if (session.isFinished()) {
                 oppSession.setFinished(true);
             }
+            oppSession.setMoveCount(session.getMoveCount());
             opponent.updateGameSession(oppSession);
 
             playerService.registerOrUpdate(opponent);

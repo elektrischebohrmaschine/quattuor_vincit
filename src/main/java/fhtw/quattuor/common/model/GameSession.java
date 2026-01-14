@@ -91,8 +91,19 @@ public class GameSession {
 
     @Override
     public String toString() {
-        return "session Nr: " + getSessionNumber() + "\n" +
-                "Opponent: " + getOpponent() + "\n" +
-                "ur turn: " + isYourTurn();
+        String returnString = "";
+        if (isFinished) {
+            returnString =
+                    "Game finished!\n" +
+                    "Opponent: " + opponent + "\n" +
+                    "Session Nr: " + getSessionNumber() + "\n";
+        } else {
+            String turn = isYourTurn() ? "Yes" : "No";
+            returnString = "Opponent: " + opponent + "\n" +
+                    "Moves Made: " + getMoveCount() + "\n" +
+                    "Session Nr: " + getSessionNumber() + "\n" +
+                    "Your Turn? " + turn;
+        }
+        return returnString;
     }
 }

@@ -45,12 +45,12 @@
             </CheckBox>
             <TabPane prefHeight="495.0" prefWidth="230.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                <tabs>
-                  <Tab text="Online Players">
+                  <Tab text="Friendlist">
                      <content>
                         <ListView fx:id="list_online" onMouseClicked="#onOnlinePlayersClick" prefHeight="200.0" prefWidth="200.0" />
                      </content>
                   </Tab>
-                  <Tab text="Paused Games">
+                  <Tab onSelectionChanged="#onPausedGamesTabClick" text="Paused Games">
                      <content>
                         <ListView fx:id="sessionList" onMouseClicked="#onPausedGamesClick" prefHeight="200.0" prefWidth="200.0" />
                      </content></Tab>
