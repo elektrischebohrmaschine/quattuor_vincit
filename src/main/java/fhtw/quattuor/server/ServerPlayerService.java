@@ -1,5 +1,6 @@
 package fhtw.quattuor.server;
 
+import fhtw.quattuor.common.model.GameSession;
 import fhtw.quattuor.common.model.Player;
 import fhtw.quattuor.common.serialization.PlayerSerializer;
 
@@ -16,7 +17,7 @@ public class ServerPlayerService {
             return;
         }
 
-        // Replace player in list if he exits
+        // Replace player in list if they exits
         for (Player p : players) {
             if (p.getUsername().equals(player.getUsername())) {
                 players.set(players.indexOf(p), player);
@@ -107,5 +108,18 @@ public class ServerPlayerService {
 
         players.add(new Player(username, password));
         return true;
+    }
+
+    public int getHighestSessionNumber() {
+        int highest = 0;
+        for (Player p : players) {
+            for (GameSession session : p.getGameSessions()) {
+                if (session.getSessionNumber() > highest) {
+                    highest = session.getSessionNumber();
+                }
+            }
+        }
+
+        return highest;
     }
 }

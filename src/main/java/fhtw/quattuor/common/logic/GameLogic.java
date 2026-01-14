@@ -2,61 +2,66 @@ package fhtw.quattuor.common.logic;
 
 import fhtw.quattuor.common.model.Board;
 import fhtw.quattuor.common.model.CellStatus;
+import fhtw.quattuor.common.model.GameSession;
 
-public class GameLogicSingle {
-    private boolean player_one_turn = true;
+public class GameLogic {
     private boolean levelMode = false;
     private SingleLevels singleLevels;
-    private Board board;
+    private GameSession gameSession;
 
-    public GameLogicSingle(int size_x, int size_y) {
-        this.board = new Board(size_x, size_y);
+    public GameLogic(int row, int col) {
+        this.gameSession = new GameSession(row, col);
+    }
+
+    public GameLogic(GameSession gameSession) {
+        this.gameSession = gameSession;
     }
 
     public boolean valid_move(int x, int y) {
         boolean valid = false;
 
-        if (board.getCellStatus(x, y) != CellStatus.EMPTY) {
+        if (gameSession.getBoard().getCellStatus(x, y) != CellStatus.EMPTY) {
             return valid;
         }
 
-        if (x== board.boardHeight()-1 ){
-        } else if (board.getCellStatus(x+1, y) == CellStatus.EMPTY){
+        if (x == gameSession.getBoard().boardHeight() - 1) {
+        } else if (gameSession.getBoard().getCellStatus(x + 1, y) == CellStatus.EMPTY) {
             return valid;
         }
 
         // Set Cell depending on current player
-        if (player_one_turn) {
-            board.setCellStatus(x, y, CellStatus.PLAYER1);
-            } else {
-                board.setCellStatus(x, y, CellStatus.PLAYER2);
-            }
+        if (gameSession.getYourTurn()) {
+            gameSession.getBoard().setCellStatus(x, y, CellStatus.PLAYER1);
+        } else {
+            gameSession.getBoard().setCellStatus(x, y, CellStatus.PLAYER2);
+        }
 
         valid = true;
+        gameSession.increaseMoveCount();
 
         // DEBUG - Remove later :)
-        board.print_board();
+        gameSession.getBoard().print_board();
 
         return valid;
     }
 
     public void toggle_player_turn() {
-        player_one_turn = !player_one_turn;
+        gameSession.toggleTurn();
     }
 
     public boolean isPlayer_one_turn() {
-        return player_one_turn;
+        return gameSession.getYourTurn();
     }
 
     public void setPlayer_one_turn(boolean player_one_turn) {
-        this.player_one_turn = player_one_turn;
+        this.gameSession.setYourTurn(player_one_turn);
     }
 
     public int checkWinCondition(Board board) {
         int player_one = 1;
         int player_two = 2;
         int draw = 3;
-        int continues= 0;
+        int continues = 0;
 
 
         // vertikal
@@ -80,7 +85,7 @@ public class GameLogicSingle {
 
                 if (streak_p1 == 4) {
                     return player_one;
-                }else if(streak_p2 == 4){
+                } else if (streak_p2 == 4) {
                     return player_two;
                 }
             }
@@ -106,7 +111,7 @@ public class GameLogicSingle {
 
                 if (streak_p1 == 4) {
                     return player_one;
-                }else if(streak_p2 == 4){
+                } else if (streak_p2 == 4) {
                     return player_two;
                 }
             }
@@ -128,9 +133,9 @@ public class GameLogicSingle {
                     }
                 }
 
-                if (streak_p1 == 4){
+                if (streak_p1 == 4) {
                     return player_one;
-                }else if(streak_p2 == 4){
+                } else if (streak_p2 == 4) {
                     return player_two;
                 }
             }
@@ -138,7 +143,7 @@ public class GameLogicSingle {
 
         // diagonal (rechts -> links)
         for (int row = 3; row < board.boardHeight(); row++) {
-            for (int col = 0; col < board.boardWidth()-3; col++) {
+            for (int col = 0; col < board.boardWidth() - 3; col++) {
 
                 int streak_p1 = 0;
                 int streak_p2 = 0;
@@ -153,18 +158,18 @@ public class GameLogicSingle {
                     }
                 }
 
-                if (streak_p1 == 4){
+                if (streak_p1 == 4) {
                     return player_one;
-                }else if(streak_p2 == 4){
+                } else if (streak_p2 == 4) {
                     return player_two;
                 }
             }
         }
 
         //draw
-        for (int row = 0; row < board.boardHeight();) {
+        for (int row = 0; row < board.boardHeight(); ) {
             for (int col = 0; col < board.boardWidth(); col++) {
-                if(board.getCellStatus(row, col) == CellStatus.EMPTY){
+                if (board.getCellStatus(row, col) == CellStatus.EMPTY) {
                     return continues;
                 }
             }
@@ -173,12 +178,17 @@ public class GameLogicSingle {
         return continues;
     }
 
-    public int getWinner(){
-        return checkWinCondition(board);
+    public int getWinner() {
+        int result = checkWinCondition(gameSession.getBoard());
+        if (result != 0) {
+            gameSession.setFinished(true);
+        }
+        return result;
     }
 
-    public void LevelLaden (SingleLevels level){
-        this.board = level.getBoard();
+    public void LevelLaden(SingleLevels level) {
+        this.gameSession.setBoard(level.getBoard());
+        this.gameSession.setOpponent("Computer " + level.getLevelSelected());
         this.singleLevels = level;
     }
 
@@ -186,23 +196,32 @@ public class GameLogicSingle {
         singleLevels.setMaxMoves(singleLevels.getMaxMoves() - 1);
     }
 
-    public int getMaxMoves(){
+    public int getMaxMoves() {
         return singleLevels.getMaxMoves();
     }
 
     public void enemyTurn() {
-        this.board = singleLevels.enemyTurn(board);
+        this.gameSession.setBoard(singleLevels.enemyTurn(gameSession.getBoard()));
     }
 
     public Board getBoard() {
-        return this.board;
+        return this.gameSession.getBoard();
     }
 
     public boolean getLevelMode() {
-       return levelMode;
+        return levelMode;
     }
 
     public void setLevelMode(boolean levelMode) {
         this.levelMode = levelMode;
+    }
+
+    public void setGameSession(GameSession gameSession) {
+        this.gameSession = gameSession;
+        levelMode = false;
+    }
+
+    public GameSession getGameSession() {
+        return gameSession;
     }
 }

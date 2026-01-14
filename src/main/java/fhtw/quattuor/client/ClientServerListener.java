@@ -1,7 +1,9 @@
 package fhtw.quattuor.client;
 
 import fhtw.quattuor.common.net.NetMessage;
+import fhtw.quattuor.common.serialization.GameSessionSerializer;
 import fhtw.quattuor.common.serialization.NetMessageSerializer;
+import fhtw.quattuor.common.serialization.PlayerSerializer;
 
 import java.io.BufferedReader;
 
@@ -10,6 +12,8 @@ public class ClientServerListener implements Runnable {
     private final BufferedReader in;
     private final NetMessageSerializer msgSer;
     private final ClientController clientController;
+    private final PlayerSerializer playerSer = new PlayerSerializer();
+    private final GameSessionSerializer gameSessionSer= new GameSessionSerializer();
 
     public ClientServerListener(BufferedReader in, NetMessageSerializer msgSer, ClientController clientController) {
         this.in = in;
@@ -48,13 +52,16 @@ public class ClientServerListener implements Runnable {
                         clientController.callbackLogoutSuccess();
                         break;
                     case REGISTER_SUCCESS:
-                        clientController.callbackRegisterSuccess();
+                        clientController.callbackRegisterSuccess(msg.getPayload());
                         break;
                     case REGISTER_FAIL:
                         clientController.callbackRegisterFail();
                         break;
-                    case ERROR:
-                        System.out.println("Received Error from Server: " + msg.getError());
+                    case SESSION_UPDATE:
+                        clientController.callbackSessionUpdate(gameSessionSer.deserializeSession(msg.getPayload()));
+                        break;
+                    case SET_ALL_SESSIONS:
+                        clientController.callbackSetAllSessions(msg.getPayload());
                         break;
                     case ONLINE_LIST:
                         clientController.callbackOnlineList(msg.getPayload());
@@ -64,6 +71,9 @@ public class ClientServerListener implements Runnable {
                         break;
                     case HIGHSCORE_LIST:
                         clientController.callbackHighscoreList(msg.getPayload());
+                        break;
+                    case ERROR:
+                        System.out.println("Received Error from Server: " + msg.getError());
                         break;
                     default:
                         System.out.println("Received Message Type: " + msg.getType());

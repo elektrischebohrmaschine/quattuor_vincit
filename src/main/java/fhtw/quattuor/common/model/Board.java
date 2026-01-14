@@ -3,8 +3,7 @@ package fhtw.quattuor.common.model;
 public class Board {
     private CellStatus[][] board;
 
-    public Board() {
-    }
+    public Board() {}
 
     public Board(int size_x, int size_y) {
         this.board = new CellStatus[size_x][size_y];
@@ -47,11 +46,34 @@ public class Board {
         this.board = board;
     }
 
-    public int getHeight(){
+    public int boardHeight(){
         return board.length;
     }
 
-    public int getWidth(){
+    public int boardWidth(){
         return board[0].length;
+    }
+
+    public Board flippedBoard() {
+        int height = boardHeight();
+        int width = boardWidth();
+
+        Board flipped = new Board(height, width);
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                CellStatus current = getCellStatus(i, j);
+
+                if (current == CellStatus.PLAYER1) {
+                    flipped.setCellStatus(i, j, CellStatus.PLAYER2);
+                } else if (current == CellStatus.PLAYER2) {
+                    flipped.setCellStatus(i, j, CellStatus.PLAYER1);
+                } else {
+                    flipped.setCellStatus(i, j, CellStatus.EMPTY);
+                }
+            }
+        }
+
+        return flipped;
     }
 }

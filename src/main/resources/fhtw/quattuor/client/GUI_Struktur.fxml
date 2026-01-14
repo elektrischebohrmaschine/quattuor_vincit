@@ -19,7 +19,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Text?>
 
-<HBox prefHeight="628.0" prefWidth="838.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fhtw.quattuor.client.ClientController">
+<HBox prefHeight="628.0" prefWidth="1102.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fhtw.quattuor.client.ClientController">
    <children>
       <VBox prefHeight="618.0" prefWidth="334.0">
          <children>
@@ -47,12 +47,12 @@
                <tabs>
                   <Tab text="Friendlist">
                      <content>
-                        <ListView fx:id="list_online" prefHeight="200.0" prefWidth="200.0"/>
+                        <ListView fx:id="list_online" onMouseClicked="#onOnlinePlayersClick" prefHeight="200.0" prefWidth="200.0" />
                      </content>
                   </Tab>
-                  <Tab text="Paused Games">
+                  <Tab onSelectionChanged="#onPausedGamesTabClick" text="Paused Games">
                      <content>
-                        <ListView prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="sessionList" onMouseClicked="#onPausedGamesClick" prefHeight="200.0" prefWidth="200.0" />
                      </content></Tab>
                   <Tab text="Highscore">
                   <content>
@@ -76,7 +76,7 @@
                   <ToolBar prefHeight="40.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                     <items>
                         <Text fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Opponent: " />
-                        <Text fx:id="txt_player" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="insert username? " />
+                        <Text fx:id="txt_opponent" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="insert username? " />
                        <Text text="Player:" />
                        <ColorPicker fx:id="playerColor" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Player">
                           <value>
@@ -89,7 +89,7 @@
                              <Color red="1.0" green="0.0" blue="0.0" />
                           </value>
                        </ColorPicker>
-                        <ToggleButton fx:id="btn_turn" mnemonicParsing="false" prefHeight="26.0" prefWidth="94.0" text="your turn" textAlignment="CENTER">
+                        <ToggleButton fx:id="btn_turn" mnemonicParsing="false" onAction="#onTurnButtonClick" prefHeight="26.0" prefWidth="94.0" text="your turn" textAlignment="CENTER">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>

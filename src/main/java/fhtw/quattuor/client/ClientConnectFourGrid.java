@@ -1,8 +1,10 @@
 package fhtw.quattuor.client;
 
+import fhtw.quattuor.common.logic.GameLogic;
 import fhtw.quattuor.common.logic.GameLogicSingle;
 import fhtw.quattuor.common.logic.SingleLevels;
 import fhtw.quattuor.common.model.CellStatus;
+import fhtw.quattuor.common.model.GameSession;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -10,13 +12,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class ClientConnectFourGrid {
+    final private ClientController controller;
     final private int GRID_HEIGHT_X = 6;
     final private int GRID_WIDTH_Y = 7;
 
     private Button[][] buttonArray = new Button[GRID_HEIGHT_X][GRID_WIDTH_Y];
-    private GameLogicSingle logic = new GameLogicSingle(GRID_HEIGHT_X, GRID_WIDTH_Y);
+    private GameLogic logic = new GameLogic(GRID_HEIGHT_X, GRID_WIDTH_Y);
     private TextField showsWinner = new TextField();
     final private String ONGOING_GAME_TEXT  = "WHO IS WINNING?";
+    final private String WIN_TEXT = "The Winner is: ";
+    final private String DRAW_TEXT = "It's a draw!";
 
     final private int BTN_SIZE = 50;
     final private int BTN_SPACING = 2;
@@ -25,6 +30,10 @@ public class ClientConnectFourGrid {
     final private String COLOR_BTN_DISABLE = "-fx-background-color: #ececec;";
     private String playerOneColor = "-fx-background-color: yellow;";
     private String playerTwoColor = "-fx-background-color: red;";
+
+    public ClientConnectFourGrid(ClientController controller) {
+        this.controller = controller;
+    }
 
     public VBox generateGrid() {
         VBox outer = new VBox();
@@ -80,6 +89,7 @@ public class ClientConnectFourGrid {
 
             int winner = logic.getWinner();
             if (logic.getLevelMode()) {
+                // Singleplayer Level Logic
                 if (winner == 1) {
                     showsWinner.setText("Yaaay you won");
                     disableButtons();
@@ -97,14 +107,27 @@ public class ClientConnectFourGrid {
                     }
                 }
             } else {
-                if (winner == 1 || winner == 2) {
-                    showsWinner.setText("WINNER: " + winner);
-                    disableButtons();
-                } else if (winner == 3) {
-                    showsWinner.setText("its a draw");
-                    disableButtons();
+                // Multiplayer Logic
+                if (winner != 0) {
+                    setWinnerText(winner);
+                    logic.getGameSession().setFinished(true);
                 }
+
+                controller.onMoveCommitted(logic.getGameSession());
+                disableButtons();
             }
+        }
+    }
+
+    private void setWinnerText(int winner) {
+        if (winner == 1 || winner == 2) {
+            if (winner == 1) {
+                showsWinner.setText(WIN_TEXT + "You!");
+            } else {
+                showsWinner.setText(WIN_TEXT + getOpponentName());
+            }
+        } else if (winner == 3) {
+            showsWinner.setText(DRAW_TEXT);
         }
     }
 
@@ -160,17 +183,44 @@ public class ClientConnectFourGrid {
         SingleLevels lvl = new SingleLevels(level);
 
         logic.LevelLaden(lvl);
+        controller.setOpponentText(getOpponentName());
+        controller.toggleTurnButton(logic.getGameSession());
         showsWinner.setText("Moves remaining: " + logic.getMaxMoves());
 
         setAllColours();
     }
 
-    public void setPlayerColors(boolean playerOne, String color) {
-        if (playerOne) {
-            playerOneColor = "-fx-background-color: " + color + ";";
-        } else  {
-            playerTwoColor = "-fx-background-color: " + color + ";";
-        }
+    public void setPlayerColors(String playerColor, String opponentColor) {
+        playerOneColor = "-fx-background-color: " + playerColor + ";";
+        playerTwoColor = "-fx-background-color: " + opponentColor + ";";
         setAllColours();
+    }
+
+    public void loadGameSession(GameSession gameSession) {
+        logic.setGameSession(gameSession);
+        if (gameSession.isFinished()) {
+            setWinnerText(logic.getWinner());
+            disableButtons();
+            setAllColours();
+            return;
+        }
+
+        showsWinner.setText("Now playing against: " + gameSession.getOpponent() + " (Session ID: " + gameSession.getSessionNumber() + ")");
+
+        if (logic.isPlayer_one_turn()) {
+            resetButtons();
+        } else {
+            disableButtons();
+        }
+
+        setAllColours();
+    }
+
+    public String getOpponentName() {
+        return logic.getGameSession().getOpponent();
+    }
+
+    public int getGameSessionNumber() {
+        return logic.getGameSession().getSessionNumber();
     }
 }

@@ -2,9 +2,6 @@ package fhtw.quattuor.common.model;
 
 
 public class GameSession {
-    private final int row = 6;
-    private final int col = 7;
-
     private Board board;
     private String opponent;
     private int sessionNumber;
@@ -13,11 +10,13 @@ public class GameSession {
     private int moveCount;
 
     public GameSession() {
+    }
+
+    public GameSession(int row, int col) {
         this.board = new Board(row, col);
     }
 
-
-    public GameSession(String opponent, int sessionNumber, boolean yourTurn) {
+    public GameSession(String opponent, int sessionNumber, boolean yourTurn, int row, int col) {
         this.board = new Board(row, col);
         this.opponent = opponent;
         this.sessionNumber = sessionNumber;
@@ -74,7 +73,37 @@ public class GameSession {
         this.yourTurn = yourTurn;
     }
 
+    public boolean getYourTurn() {
+        return yourTurn;
+    }
+
     public void setMoveCount(int moveCount) {
         this.moveCount = moveCount;
+    }
+
+    public void increaseMoveCount() {
+        this.moveCount++;
+    }
+
+    public Board flippedBoard() {
+        return board.flippedBoard();
+    }
+
+    @Override
+    public String toString() {
+        String returnString = "";
+        if (isFinished) {
+            returnString =
+                    "Game finished!\n" +
+                    "Opponent: " + opponent + "\n" +
+                    "Session Nr: " + getSessionNumber() + "\n";
+        } else {
+            String turn = isYourTurn() ? "Yes" : "No";
+            returnString = "Opponent: " + opponent + "\n" +
+                    "Moves Made: " + getMoveCount() + "\n" +
+                    "Session Nr: " + getSessionNumber() + "\n" +
+                    "Your Turn? " + turn;
+        }
+        return returnString;
     }
 }

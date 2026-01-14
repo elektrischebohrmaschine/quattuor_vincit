@@ -1,8 +1,10 @@
 package fhtw.quattuor.client;
 
+import fhtw.quattuor.common.model.GameSession;
 import fhtw.quattuor.common.model.Player;
 import fhtw.quattuor.common.net.NetMessage;
 import fhtw.quattuor.common.net.NetType;
+import fhtw.quattuor.common.serialization.GameSessionSerializer;
 import fhtw.quattuor.common.serialization.NetMessageSerializer;
 import fhtw.quattuor.common.serialization.PlayerSerializer;
 
@@ -17,21 +19,21 @@ import static javafx.application.Platform.exit;
 public class ClientTCP {
 
     private final ClientController clientController;
+    private final PlayerSerializer playerSerializer;
+    private final GameSessionSerializer gameSessionSerializer;
+    private Player player;
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
     private NetMessageSerializer msgSer;
-    private String currentUsername;
-    private String currentPassword;
-    private final PlayerSerializer playerSer = new PlayerSerializer();
 
     private final String host = "localhost";
     private final int port = 5000;
 
     public ClientTCP(ClientController clientController) {
         this.clientController = clientController;
-
-
+        this.playerSerializer = new PlayerSerializer();
+        this.gameSessionSerializer = new GameSessionSerializer();
 
         try {
             socket = new Socket(host, port);
@@ -51,8 +53,6 @@ public class ClientTCP {
     }
 
     public void userLogin(String username, String password) {
-        currentUsername = username;
-        currentPassword = password;
         NetMessage m = new NetMessage(NetType.LOGIN);
         m.setUsername(username);
         m.setPassword(password);
@@ -62,32 +62,45 @@ public class ClientTCP {
     public void userLogout() {
         NetMessage m = new NetMessage(NetType.LOGOUT);
         out.println(msgSer.toJson(m));
-        currentUsername = null;
-        currentPassword = null;
+        player = null;
     }
 
     public void userRegister(String username, String password) {
-        currentUsername = username;
-        currentPassword = password;
         NetMessage m = new NetMessage(NetType.REGISTER);
         m.setUsername(username);
         m.setPassword(password);
         out.println(msgSer.toJson(m));
     }
+    public void requestAllSessions() {
+        NetMessage m = new NetMessage(NetType.GET_ALL_SESSIONS);
+        out.println(msgSer.toJson(m));
+    }
+
+    public void sessionUpdate(GameSession gameSession) {
+        NetMessage m = new NetMessage(NetType.SESSION_UPDATE);
+        m.setUsername(player.getUsername());
+        m.setPayload(gameSessionSerializer.serializeSession(gameSession));
+        out.println(msgSer.toJson(m));
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
 
     public void updateMyColors(String primaryHex, String fallbackHex) {
-        if (currentUsername == null || currentPassword == null) return;
+        if (player == null) return;
 
-        Player p = new Player();
-        p.setUsername(currentUsername);
-        p.setPassword(currentPassword);
-        p.setPlayerColor(primaryHex);
-        p.setOpponentColor(fallbackHex);
+        player.setPlayerColor(primaryHex);
+        player.setOpponentColor(fallbackHex);
 
         NetMessage m = new NetMessage(NetType.PLAYER_UPDATE);
-        m.setUsername(currentUsername);
-        m.setPassword(currentPassword);
-        m.setPayload(playerSer.serializePlayer(p));
+        m.setUsername(player.getUsername());
+        m.setPassword(player.getPassword());
+        m.setPayload(playerSerializer.serializePlayer(player));
 
         out.println(msgSer.toJson(m));
     }
@@ -97,4 +110,19 @@ public class ClientTCP {
         out.println(msgSer.toJson(m));
     }
 
+    public void startSession(String opponentName) {
+        NetMessage m = new NetMessage(NetType.CREATE_SESSION);
+        m.setUsername(player.getUsername());
+        m.setPassword(player.getPassword());
+        m.setPayload(opponentName);
+        out.println(msgSer.toJson(m));
+    }
+
+    public void sessionUpdateRequest(int sessionNumber) {
+        NetMessage m = new NetMessage(NetType.SESSION_UPDATE_REQUEST);
+        m.setUsername(player.getUsername());
+        m.setPassword(player.getPassword());
+        m.setPayload(Integer.toString(sessionNumber));
+        out.println(msgSer.toJson(m));
+    }
 }
