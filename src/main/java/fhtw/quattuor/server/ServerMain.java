@@ -85,6 +85,12 @@ public class ServerMain {
         broadcastNet(msg);
     }
 
+    public void broadcastAllSessionsToUser(String username) {
+        for (ClientHandler handler : clients) {
+            handler.sendToUsername(username);
+        }
+    }
+
     private class ClientHandler implements Runnable {
         private final Socket clientSocket;
         private final ServerMain server;
@@ -265,6 +271,9 @@ public class ServerMain {
             playerService.registerOrUpdate(opponent);
             playerService.safePlayersToDisk();
 
+            // Send to Opponent, for Paused Games
+            broadcastAllSessionsToUser(opponent.getUsername());
+
             NetMessage res = new NetMessage(NetType.SESSION_UPDATE);
             res.setUsername(loggedInPlayer.getUsername());
             res.setPayload(gameSessionSer.serializeSession(session));
@@ -308,6 +317,9 @@ public class ServerMain {
             playerService.registerOrUpdate(loggedInPlayer);
 
             playerService.safePlayersToDisk();
+            // Send updated sessions to users (for synchro, and for paused games)
+            broadcastAllSessionsToUser(opponent.getUsername());
+            broadcastAllSessionsToUser(loggedInPlayer.getUsername());
 
             System.out.println("Updated GameSession: ID: " + session.getSessionNumber());
         }
@@ -444,6 +456,16 @@ public class ServerMain {
         private void sendError(NetType code, String text) {
             NetMessage res = new NetMessage(code);
             res.setError(text);
+            out.println(msgSer.toJson(res));
+        }
+
+        public void sendToUsername(String username) {
+            if (loggedInPlayer == null || !loggedInPlayer.getUsername().equals(username)) {
+                return;
+            }
+            NetMessage res = new NetMessage(NetType.SET_ALL_SESSIONS);
+            res.setUsername(username);
+            res.setPayload(playerSer.serializePlayer(loggedInPlayer));
             out.println(msgSer.toJson(res));
         }
     }

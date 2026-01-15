@@ -223,4 +223,8 @@ public class ClientConnectFourGrid {
     public int getGameSessionNumber() {
         return logic.getGameSession().getSessionNumber();
     }
+
+    public boolean getLevelMode() {
+        return logic.getLevelMode();
+    }
 }

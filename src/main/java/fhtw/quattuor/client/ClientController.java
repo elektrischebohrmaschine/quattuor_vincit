@@ -218,6 +218,12 @@ public class ClientController {
                 clientTCP.setPlayer(p);
                 loadPausedSessionList(p.getGameSessions());
                 connectFourGrid.setPlayerColors(p.getPlayerColor(), p.getOpponentColor());
+
+                // Synchronisation updating the Game live
+                if (check_synchronisation.isSelected() && !connectFourGrid.getLevelMode()) {
+                    GameSession currentSession = p.getGameSessionByNumber(connectFourGrid.getGameSessionNumber());
+                    connectFourGrid.loadGameSession(currentSession);
+                }
             }
         } catch (Exception ignored) {}
     }
