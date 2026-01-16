@@ -1,5 +1,6 @@
 package fhtw.quattuor.server;
 
+import fhtw.quattuor.common.logic.GameLogic;
 import fhtw.quattuor.common.model.GameSession;
 import fhtw.quattuor.common.model.Player;
 import fhtw.quattuor.common.net.NetMessage;
@@ -90,6 +91,7 @@ public class ServerMain {
             handler.sendToUsername(username);
         }
     }
+
 
     private class ClientHandler implements Runnable {
         private final Socket clientSocket;
@@ -296,6 +298,9 @@ public class ServerMain {
                 return;
             }
 
+            GameSession old = loggedInPlayer.getGameSessionByNumber(session.getSessionNumber());
+            boolean wasFinished = (old != null && old.isFinished());
+
             loggedInPlayer.updateGameSession(session);
 
             // Write updated Session to the Opponent Player as well
@@ -304,13 +309,32 @@ public class ServerMain {
                 sendError(NetType.ERROR, "Error deserializing opponent");
                 return;
             }
+
             GameSession oppSession = opponent.getGameSessionByNumber(session.getSessionNumber());
+            if (oppSession == null) {
+                sendError(NetType.ERROR, "Opponent session not found");
+                return;
+            }
+
             oppSession.toggleTurn();
             oppSession.setBoard(session.flippedBoard());
-            if (session.isFinished()) {
-                oppSession.setFinished(true);
-            }
             oppSession.setMoveCount(session.getMoveCount());
+
+            GameLogic gl = new GameLogic(session);
+            int outcome = gl.checkWinCondition(session.getBoard());
+
+            boolean nowFinished = (outcome != 0);
+            session.setFinished(nowFinished);
+            oppSession.setFinished(nowFinished);
+
+            if (nowFinished && !wasFinished) {
+                if (outcome == 1) {
+                    loggedInPlayer.increaseHighscore();
+                } else if (outcome == 2) {
+                    opponent.increaseHighscore();
+                }
+            }
+
             opponent.updateGameSession(oppSession);
 
             playerService.registerOrUpdate(opponent);

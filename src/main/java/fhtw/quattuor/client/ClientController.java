@@ -386,4 +386,10 @@ public class ClientController {
         }
         clientTCP.requestAllSessions();
     }
+
+    @FXML
+    public void onHighscoreTabClick() {
+        if (!connected) return;
+        clientTCP.requestHighscores();
+    }
 }

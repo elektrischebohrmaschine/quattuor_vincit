@@ -54,7 +54,7 @@
                      <content>
                         <ListView fx:id="sessionList" onMouseClicked="#onPausedGamesClick" prefHeight="200.0" prefWidth="200.0" />
                      </content></Tab>
-                  <Tab text="Highscore">
+                  <Tab text="Highscore" onSelectionChanged="#onHighscoreTabClick">
                   <content>
                      <ListView fx:id="list_highscore" />
                   </content>
