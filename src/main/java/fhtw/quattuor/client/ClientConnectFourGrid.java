@@ -15,6 +15,7 @@ public class ClientConnectFourGrid {
     final private ClientController controller;
     final private int GRID_HEIGHT_X = 6;
     final private int GRID_WIDTH_Y = 7;
+    private int currentLevelId = 0;
 
     private Button[][] buttonArray = new Button[GRID_HEIGHT_X][GRID_WIDTH_Y];
     private GameLogic logic = new GameLogic(GRID_HEIGHT_X, GRID_WIDTH_Y);
@@ -88,10 +89,12 @@ public class ClientConnectFourGrid {
 
 
             int winner = logic.getWinner();
+
             if (logic.getLevelMode()) {
                 // Singleplayer Level Logic
                 if (winner == 1) {
                     showsWinner.setText("Yaaay you won");
+                    if (currentLevelId > 0) controller.onSingleLevelCompleted(currentLevelId);
                     disableButtons();
                 } else {
                     logic.decreaseMaxMoves();
@@ -175,6 +178,7 @@ public class ClientConnectFourGrid {
     }
 
     public void startLevel(int level) {
+        this.currentLevelId = level;
         resetButtons();
         logic.setPlayer_one_turn(true);
         showsWinner.setText(ONGOING_GAME_TEXT);

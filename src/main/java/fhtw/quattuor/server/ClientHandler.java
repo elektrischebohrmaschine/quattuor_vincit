@@ -354,6 +354,8 @@ public class ClientHandler implements Runnable {
         loggedInPlayer.setPlayerColor(updated.getPlayerColor());
         loggedInPlayer.setOpponentColor(updated.getOpponentColor());
 
+        loggedInPlayer.setCompletedLevels(updated.getCompletedLevels());
+
         playerService().registerOrUpdate(loggedInPlayer);
         playerService().safePlayersToDisk();
 

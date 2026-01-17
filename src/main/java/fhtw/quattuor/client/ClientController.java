@@ -373,6 +373,11 @@ public class ClientController {
         });
     }
 
+    public void onSingleLevelCompleted(int levelId) {
+        if (!connected) return;
+        clientTCP.reportLevelCompleted(levelId);
+    }
+
     @FXML
     public void onTurnButtonClick() {
         clientTCP.sessionUpdateRequest(connectFourGrid.getGameSessionNumber());
