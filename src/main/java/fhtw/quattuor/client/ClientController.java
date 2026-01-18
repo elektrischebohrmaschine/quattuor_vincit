@@ -1,9 +1,11 @@
 package fhtw.quattuor.client;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import fhtw.quattuor.common.model.GameSession;
 import fhtw.quattuor.common.model.Player;
 import fhtw.quattuor.common.serialization.PlayerSerializer;
 import javafx.application.Platform;
+import javafx.collections.ObservableMap;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -15,6 +17,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.layout.HBox;
 import javafx.geometry.Pos;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +29,8 @@ public class ClientController {
 
     private final ObservableList<String> highscoreItems = FXCollections.observableArrayList();
     private final ObservableList<String> onlineItems = FXCollections.observableArrayList();
+    private final ObservableMap<String, List<Integer>> friendCompletedLevels = FXCollections.observableHashMap();
+
     private final PlayerSerializer playerSer = new PlayerSerializer();
 
     @FXML
@@ -85,11 +90,12 @@ public class ClientController {
             list_online.setCellFactory(lv -> new ListCell<>() {
                 private final Circle statusDot = new Circle(6);
                 private final Label nameLabel = new Label();
+                private final Label compLevel = new Label();
                 private final HBox container = new HBox(8);
 
                 {
                     container.setAlignment(Pos.CENTER_LEFT);
-                    container.getChildren().addAll(statusDot, nameLabel);
+                    container.getChildren().addAll(statusDot, nameLabel,compLevel);
                 }
 
                 @Override
@@ -103,6 +109,16 @@ public class ClientController {
 
                         statusDot.setStyle("-fx-fill: #2ecc71;");
 
+                        List<Integer> levels = friendCompletedLevels.get(username);
+
+                        int checks = 0;
+                        if (levels != null) {
+                            if (levels.contains(1)) checks++;
+                            if (levels.contains(2)) checks++;
+                            if (levels.contains(3)) checks++;
+                        }
+
+                        compLevel.setText(" " + "✓".repeat(checks));
                         setGraphic(container);
                     }
                 }
@@ -373,6 +389,11 @@ public class ClientController {
         });
     }
 
+    public void onSingleLevelCompleted(int levelId) {
+        if (!connected) return;
+        clientTCP.reportLevelCompleted(levelId);
+    }
+
     @FXML
     public void onTurnButtonClick() {
         clientTCP.sessionUpdateRequest(connectFourGrid.getGameSessionNumber());
@@ -392,4 +413,24 @@ public class ClientController {
         if (!connected) return;
         clientTCP.requestHighscores();
     }
+
+    public void callbackCompLevels(String payloadJson) {
+        Platform.runLater(() -> {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                var map = mapper.readValue(
+                        payloadJson,
+                        new TypeReference<java.util.Map<String, java.util.List<Integer>>>() {}
+                );
+
+                friendCompletedLevels.clear();
+                friendCompletedLevels.putAll(map);
+
+                list_online.refresh();
+            } catch (Exception e) {
+                System.out.println("UPDATE_COMP_LEVELS parse failed: " + e.getMessage());
+            }
+        });
+    }
+
 }

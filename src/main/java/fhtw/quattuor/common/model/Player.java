@@ -1,7 +1,9 @@
 package fhtw.quattuor.common.model;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Player {
     private String username;
@@ -9,7 +11,7 @@ public class Player {
     private int highscore;
     private String playerColor = "#FF0000"; //ROT
     private String opponentColor = "#FFD500"; //GELB
-
+    private List<Integer> completedLevels;
 
     private List<GameSession> gameSessions;
 
@@ -113,5 +115,25 @@ public class Player {
 
     public void removeGameSessionByNumber(int sessionNumber) {
         gameSessions.removeIf(gameSession -> gameSession.getSessionNumber() == sessionNumber);
+    }
+
+    public List<Integer> getCompletedLevels() {
+        if (completedLevels == null) completedLevels = new ArrayList<>();
+        return completedLevels;
+    }
+
+    public boolean hasCompletedLevel(int levelId) {
+        return getCompletedLevels().contains(levelId);
+    }
+
+    public void markLevelCompleted(int levelId) {
+        if (levelId <= 0) return;
+        Set<Integer> unique = new LinkedHashSet<>(getCompletedLevels());
+        unique.add(levelId);
+        completedLevels = new ArrayList<>(unique);
+    }
+
+    public void setCompletedLevels(List<Integer> completedLevels) {
+        this.completedLevels = (completedLevels == null) ? new ArrayList<>() : completedLevels;
     }
 }

@@ -72,6 +72,8 @@ public class ClientServerListener implements Runnable {
                     case HIGHSCORE_LIST:
                         clientController.callbackHighscoreList(msg.getPayload());
                         break;
+                    case UPDATE_COMP_LEVELS:
+                        clientController.callbackCompLevels(msg.getPayload());
                     case ERROR:
                         System.out.println("Received Error from Server: " + msg.getError());
                         break;

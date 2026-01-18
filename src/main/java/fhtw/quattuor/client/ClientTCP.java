@@ -1,5 +1,6 @@
 package fhtw.quattuor.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fhtw.quattuor.common.model.GameSession;
 import fhtw.quattuor.common.model.Player;
 import fhtw.quattuor.common.net.NetMessage;
@@ -125,4 +126,18 @@ public class ClientTCP {
         m.setPayload(Integer.toString(sessionNumber));
         out.println(msgSer.toJson(m));
     }
+
+    public void reportLevelCompleted(int levelId) {
+        if (player == null) return;
+        if (levelId <= 0) return;
+
+        player.markLevelCompleted(levelId);
+
+        NetMessage m = new NetMessage(NetType.PLAYER_UPDATE);
+        m.setUsername(player.getUsername());
+        m.setPassword(player.getPassword());
+        m.setPayload(playerSerializer.serializePlayer(player));
+        out.println(msgSer.toJson(m));
+    }
+
 }
