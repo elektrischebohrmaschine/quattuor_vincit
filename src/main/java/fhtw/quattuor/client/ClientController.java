@@ -176,6 +176,8 @@ public class ClientController {
             txt_username.clear();
             txt_password.clear();
             onlineItems.clear();
+            highscoreItems.clear();
+            sessionList.getItems().clear();
             btn_login.setText("Go!");
         });
     }
@@ -391,5 +393,15 @@ public class ClientController {
     public void onHighscoreTabClick() {
         if (!connected) return;
         clientTCP.requestHighscores();
+    }
+
+    public void connectionError() {
+        connected = false;
+        Platform.runLater(() -> {
+            btn_login.setText("Server Error! Login?");
+            onlineItems.clear();
+            highscoreItems.clear();
+            sessionList.getItems().clear();
+        });
     }
 }

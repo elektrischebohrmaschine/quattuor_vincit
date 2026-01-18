@@ -39,7 +39,8 @@ public class ServerMain {
                 new Thread(handler).start();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
+            System.out.println("Server exited: Connection closing.");
         }
     }
 

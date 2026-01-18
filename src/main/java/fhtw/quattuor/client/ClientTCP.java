@@ -14,45 +14,59 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import static javafx.application.Platform.exit;
-
 public class ClientTCP {
 
     private final ClientController clientController;
     private final PlayerSerializer playerSerializer;
     private final GameSessionSerializer gameSessionSerializer;
+    private final NetMessageSerializer msgSer;
     private Player player;
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
-    private NetMessageSerializer msgSer;
 
     private final String host = "localhost";
     private final int port = 5000;
+    private boolean connected = false;
 
     public ClientTCP(ClientController clientController) {
         this.clientController = clientController;
         this.playerSerializer = new PlayerSerializer();
         this.gameSessionSerializer = new GameSessionSerializer();
+        this.msgSer = new NetMessageSerializer();
 
+        connect();
+    }
+
+    private boolean connect() {
         try {
             socket = new Socket(host, port);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
-            msgSer = new NetMessageSerializer();
             System.out.println("Connected to " + host + ":" + port);
 
-            Thread readerThread = new Thread(new ClientServerListener(in, msgSer, clientController));
+            Thread readerThread = new Thread(new ClientServerListener(in, msgSer, clientController, this));
             readerThread.setDaemon(true);
             readerThread.start();
+
+            connected = true;
         } catch (IOException e) {
             System.err.println("Could not connect to " + host + ":" + port);
             System.err.println(e.getMessage());
-            exit();
+            connected = false;
+            clientController.connectionError();
         }
+
+        return connected;
     }
 
     public void userLogin(String username, String password) {
+        if (!connected) {
+            if (!connect()) {
+                return;
+            }
+        }
+
         NetMessage m = new NetMessage(NetType.LOGIN);
         m.setUsername(username);
         m.setPassword(password);
@@ -66,6 +80,12 @@ public class ClientTCP {
     }
 
     public void userRegister(String username, String password) {
+        if (!connected) {
+            if (!connect()) {
+                return;
+            }
+        }
+
         NetMessage m = new NetMessage(NetType.REGISTER);
         m.setUsername(username);
         m.setPassword(password);
@@ -124,5 +144,10 @@ public class ClientTCP {
         m.setPassword(player.getPassword());
         m.setPayload(Integer.toString(sessionNumber));
         out.println(msgSer.toJson(m));
+    }
+
+    public void serverListenerCrash() {
+        connected = false;
+        clientController.connectionError();
     }
 }
