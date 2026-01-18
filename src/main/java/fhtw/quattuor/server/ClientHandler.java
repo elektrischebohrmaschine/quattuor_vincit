@@ -1,5 +1,6 @@
 package fhtw.quattuor.server;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fhtw.quattuor.common.logic.GameLogic;
 import fhtw.quattuor.common.model.GameSession;
@@ -37,7 +38,7 @@ public class ClientHandler implements Runnable {
             this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             this.out = new PrintWriter(clientSocket.getOutputStream(), true);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Problem creating ClientHandler:\n" + e.getMessage());
         }
     }
 
@@ -47,6 +48,10 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
+        if (in == null || out == null) {
+            return;
+        }
+
         try {
             out.println("Welcome to Quattuor Vincit!");
             out.println("Please LOGIN or REGISTER (JSON).");
@@ -292,7 +297,7 @@ public class ClientHandler implements Runnable {
             NetMessage list = new NetMessage(NetType.ONLINE_LIST);
             list.setPayload(new ObjectMapper().writeValueAsString(server.getOnlineUsers()));
             out.println(msgSer.toJson(list));
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             sendError(NetType.ERROR, "Could not create ONLINE_LIST");
         }
 
@@ -327,7 +332,7 @@ public class ClientHandler implements Runnable {
             NetMessage list = new NetMessage(NetType.ONLINE_LIST);
             list.setPayload(new ObjectMapper().writeValueAsString(server.getOnlineUsers()));
             out.println(msgSer.toJson(list));
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             sendError(NetType.ERROR, "Could not create ONLINE_LIST");
         }
 

@@ -3,7 +3,6 @@ package fhtw.quattuor.client;
 import fhtw.quattuor.common.net.NetMessage;
 import fhtw.quattuor.common.serialization.GameSessionSerializer;
 import fhtw.quattuor.common.serialization.NetMessageSerializer;
-import fhtw.quattuor.common.serialization.PlayerSerializer;
 
 import java.io.BufferedReader;
 
@@ -12,13 +11,14 @@ public class ClientServerListener implements Runnable {
     private final BufferedReader in;
     private final NetMessageSerializer msgSer;
     private final ClientController clientController;
-    private final PlayerSerializer playerSer = new PlayerSerializer();
+    private final ClientTCP clientTCP;
     private final GameSessionSerializer gameSessionSer= new GameSessionSerializer();
 
-    public ClientServerListener(BufferedReader in, NetMessageSerializer msgSer, ClientController clientController) {
+    public ClientServerListener(BufferedReader in, NetMessageSerializer msgSer, ClientController clientController,  ClientTCP clientTCP) {
         this.in = in;
         this.msgSer = msgSer;
         this.clientController = clientController;
+        this.clientTCP = clientTCP;
     }
 
     @Override
@@ -35,8 +35,9 @@ public class ClientServerListener implements Runnable {
 
                 System.out.println("Received following message:");
                 System.out.println(msg.getType());
-                System.out.println(msg.getUsername());
-                System.out.println(msg.getPassword());
+                // Further "Debug" output
+                //System.out.println(msg.getUsername());
+                //System.out.println(msg.getPassword());
 
                 switch (msg.getType()) {
                     case LOGIN_SUCCESS:
@@ -78,14 +79,14 @@ public class ClientServerListener implements Runnable {
                         System.out.println("Received Error from Server: " + msg.getError());
                         break;
                     default:
-                        System.out.println("Received Message Type: " + msg.getType());
-                        System.out.println("No action planned for this Type.");
+                        System.out.println("No action planned for this Type: " + msg.getType());
                         break;
                 }
             }
         } catch (Exception e) {
             System.err.println(e.getMessage());
             System.out.println("Server Listener Thread exited: Connection to Server lost.");
+            clientTCP.serverListenerCrash();
         }
     }
 

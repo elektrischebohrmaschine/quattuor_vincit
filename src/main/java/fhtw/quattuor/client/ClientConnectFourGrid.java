@@ -74,7 +74,7 @@ public class ClientConnectFourGrid {
 
     private void btn_click(int row, int col) {
         // DEBUG OUTPUT
-        System.out.println("CLICKED: " + row + " " + col);
+        //System.out.println("CLICKED: " + row + " " + col);
 
         // GAMELOGIC
         if (logic.valid_move(row, col)) {

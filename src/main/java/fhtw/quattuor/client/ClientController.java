@@ -30,7 +30,6 @@ public class ClientController {
     private final ObservableList<String> highscoreItems = FXCollections.observableArrayList();
     private final ObservableList<String> onlineItems = FXCollections.observableArrayList();
     private final ObservableMap<String, List<Integer>> friendCompletedLevels = FXCollections.observableHashMap();
-
     private final PlayerSerializer playerSer = new PlayerSerializer();
 
     @FXML
@@ -192,6 +191,8 @@ public class ClientController {
             txt_username.clear();
             txt_password.clear();
             onlineItems.clear();
+            highscoreItems.clear();
+            sessionList.getItems().clear();
             btn_login.setText("Go!");
         });
     }
@@ -265,7 +266,11 @@ public class ClientController {
             return;
         }
         GameSession selectedSession = sessionList.getSelectionModel().getSelectedItem();
-        System.out.println("clicked on " + selectedSession);
+        if (selectedSession == null) {
+            return;
+        }
+        // Debug Output :)
+        //System.out.println("clicked on: \n" + selectedSession);
 
         clientTCP.sessionUpdateRequest(selectedSession.getSessionNumber());
     }
@@ -433,4 +438,14 @@ public class ClientController {
         });
     }
 
+
+    public void connectionError() {
+        connected = false;
+        Platform.runLater(() -> {
+            btn_login.setText("Server Error! Login?");
+            onlineItems.clear();
+            highscoreItems.clear();
+            sessionList.getItems().clear();
+        });
+    }
 }

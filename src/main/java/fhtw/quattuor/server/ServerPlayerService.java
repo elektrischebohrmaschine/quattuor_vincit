@@ -58,7 +58,7 @@ public class ServerPlayerService {
     }
 
     public void printPlayerUsernames() {
-        System.out.println("Current saved usernames:");
+        System.out.println("Current saved players:");
         for (Player p : players) {
             System.out.println(p.getUsername());
         }
