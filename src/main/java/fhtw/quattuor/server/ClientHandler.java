@@ -368,6 +368,7 @@ public class ClientHandler implements Runnable {
         NetMessage res = new NetMessage(NetType.PLAYER_UPDATE_SUCCESS);
         res.setUsername(loggedInPlayer.getUsername());
         out.println(msgSer.toJson(res));
+        server.broadcastCompLevelsSnapshot();
     }
 
     private void handleHighscoreRequest() {

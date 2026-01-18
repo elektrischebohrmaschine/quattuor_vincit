@@ -92,10 +92,10 @@ public class ServerMain {
         try {
             Map<String, List<Integer>> map = new HashMap<>();
 
-            for (String u : onlineUsers) {
-                Player p = playerService.findByUsername(u);
-                if (p != null) {
-                    map.put(u, p.getCompletedLevels());
+            for (String user : onlineUsers) {
+                Player player = playerService.findByUsername(user);
+                if (player != null) {
+                    map.put(user, player.getCompletedLevels());
                 }
             }
 
