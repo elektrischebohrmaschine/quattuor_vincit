@@ -258,6 +258,8 @@ public class ClientHandler implements Runnable {
         loggedInPlayer = null;
         NetMessage res = new NetMessage(NetType.LOGOUT_SUCCESS);
         out.println(msgSer.toJson(res));
+        server.broadcastCompLevelsSnapshot();
+
     }
 
     private void handleLogin(NetMessage msg) {
@@ -295,6 +297,8 @@ public class ClientHandler implements Runnable {
         }
 
         server.broadcastPresence(p.getUsername(), true);
+        server.broadcastCompLevelsSnapshot();
+
     }
 
     private void handleRegister(NetMessage msg) {
@@ -328,6 +332,8 @@ public class ClientHandler implements Runnable {
         }
 
         server.broadcastPresence(loggedInPlayer.getUsername(), true);
+        server.broadcastCompLevelsSnapshot();
+
     }
 
     private void handlePlayerUpdate(NetMessage msg) {
@@ -390,4 +396,6 @@ public class ClientHandler implements Runnable {
         res.setPayload(playerSer.serializePlayer(loggedInPlayer));
         out.println(msgSer.toJson(res));
     }
+
+
 }

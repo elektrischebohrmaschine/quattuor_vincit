@@ -23,6 +23,7 @@ public enum NetType {
     PRESENCE_UPDATE,
     HIGHSCORE_LIST,
     HIGHSCORE_REQUEST,
+    UPDATE_COMP_LEVELS,
     FORBIDDEN,
     ERROR
 }

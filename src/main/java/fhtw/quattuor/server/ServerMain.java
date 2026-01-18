@@ -1,5 +1,7 @@
 package fhtw.quattuor.server;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fhtw.quattuor.common.model.Player;
 import fhtw.quattuor.common.net.NetMessage;
 import fhtw.quattuor.common.net.NetType;
 import fhtw.quattuor.common.serialization.NetMessageSerializer;
@@ -7,6 +9,9 @@ import fhtw.quattuor.common.serialization.NetMessageSerializer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -80,6 +85,26 @@ public class ServerMain {
     public void broadcastAllSessionsToUser(String username) {
         for (ClientHandler handler : clients) {
             handler.sendToUsername(username);
+        }
+    }
+
+    public void broadcastCompLevelsSnapshot() {
+        try {
+            Map<String, List<Integer>> map = new HashMap<>();
+
+            for (String u : onlineUsers) {
+                Player p = playerService.findByUsername(u);
+                if (p != null) {
+                    map.put(u, p.getCompletedLevels());
+                }
+            }
+
+            NetMessage msg = new NetMessage(NetType.UPDATE_COMP_LEVELS);
+            msg.setPayload(new ObjectMapper().writeValueAsString(map));
+            broadcastNet(msg);
+
+        } catch (Exception e) {
+            System.out.println("broadcastCompLevelsSnapshot failed: " + e.getMessage());
         }
     }
 }
