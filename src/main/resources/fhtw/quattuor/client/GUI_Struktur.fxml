@@ -19,9 +19,9 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Text?>
 
-<HBox prefHeight="628.0" prefWidth="1102.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fhtw.quattuor.client.ClientController">
+<HBox prefHeight="628.0" prefWidth="1102.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fhtw.quattuor.client.ClientController">
    <children>
-      <VBox prefHeight="618.0" prefWidth="334.0">
+      <VBox minWidth="300.0" prefHeight="618.0" prefWidth="300.0">
          <children>
             <TextField fx:id="txt_username" promptText="Username">
                <VBox.margin>
