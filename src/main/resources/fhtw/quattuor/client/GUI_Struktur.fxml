@@ -19,7 +19,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Text?>
 
-<HBox prefHeight="628.0" prefWidth="1102.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fhtw.quattuor.client.ClientController">
+<HBox prefHeight="628.0" prefWidth="1102.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fhtw.quattuor.client.ClientController">
    <children>
       <VBox prefHeight="618.0" prefWidth="334.0">
          <children>
@@ -43,7 +43,40 @@
                   <Insets left="5.0" />
                </VBox.margin>
             </CheckBox>
-            <TabPane prefHeight="495.0" prefWidth="230.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+            <HBox alignment="CENTER" minHeight="45.0" prefHeight="45.0" prefWidth="330.0">
+               <children>
+                 <Text text="Player:">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Text>
+                 <ColorPicker fx:id="playerColor" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Player">
+                    <value>
+                       <Color red="1.0" green="0.8352941" blue="0.0" />
+                    </value>
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                 </ColorPicker>
+                 <Text text="Opponent:">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Text>
+                 <ColorPicker fx:id="opponentColor" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Opponent">
+                    <value>
+                       <Color red="1.0" green="0.0" blue="0.0" />
+                    </value>
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                 </ColorPicker>
+               </children>
+               <VBox.margin>
+                  <Insets right="5.0" top="5.0" />
+               </VBox.margin>
+            </HBox>
+            <TabPane prefHeight="475.0" prefWidth="325.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                <tabs>
                   <Tab text="Friendlist">
                      <content>
@@ -54,7 +87,7 @@
                      <content>
                         <ListView fx:id="sessionList" onMouseClicked="#onPausedGamesClick" prefHeight="200.0" prefWidth="200.0" />
                      </content></Tab>
-                  <Tab text="Highscore" onSelectionChanged="#onHighscoreTabClick">
+                  <Tab onSelectionChanged="#onHighscoreTabClick" text="Highscore">
                   <content>
                      <ListView fx:id="list_highscore" />
                   </content>
@@ -77,18 +110,6 @@
                     <items>
                         <Text fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="Opponent: " />
                         <Text fx:id="txt_opponent" fontSmoothingType="LCD" strokeType="OUTSIDE" strokeWidth="0.0" text="insert username? " />
-                       <Text text="Player:" />
-                       <ColorPicker fx:id="playerColor" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Player">
-                          <value>
-                             <Color red="1.0" green="0.8352941" blue="0.0" />
-                          </value>
-                       </ColorPicker>
-                       <Text text="Opponent:" />
-                       <ColorPicker fx:id="opponentColor" editable="true" prefHeight="26.0" prefWidth="110.0" promptText="Opponent">
-                          <value>
-                             <Color red="1.0" green="0.0" blue="0.0" />
-                          </value>
-                       </ColorPicker>
                         <ToggleButton fx:id="btn_turn" mnemonicParsing="false" onAction="#onTurnButtonClick" prefHeight="26.0" prefWidth="94.0" text="your turn" textAlignment="CENTER">
                            <opaqueInsets>
                               <Insets />
