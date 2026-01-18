@@ -251,7 +251,11 @@ public class ClientController {
             return;
         }
         GameSession selectedSession = sessionList.getSelectionModel().getSelectedItem();
-        System.out.println("clicked on " + selectedSession);
+        if (selectedSession == null) {
+            return;
+        }
+        // Debug Output :)
+        //System.out.println("clicked on: \n" + selectedSession);
 
         clientTCP.sessionUpdateRequest(selectedSession.getSessionNumber());
     }

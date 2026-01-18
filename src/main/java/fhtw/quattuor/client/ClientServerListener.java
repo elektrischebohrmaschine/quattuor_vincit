@@ -35,8 +35,9 @@ public class ClientServerListener implements Runnable {
 
                 System.out.println("Received following message:");
                 System.out.println(msg.getType());
-                System.out.println(msg.getUsername());
-                System.out.println(msg.getPassword());
+                // Further "Debug" output
+                //System.out.println(msg.getUsername());
+                //System.out.println(msg.getPassword());
 
                 switch (msg.getType()) {
                     case LOGIN_SUCCESS:
@@ -76,8 +77,7 @@ public class ClientServerListener implements Runnable {
                         System.out.println("Received Error from Server: " + msg.getError());
                         break;
                     default:
-                        System.out.println("Received Message Type: " + msg.getType());
-                        System.out.println("No action planned for this Type.");
+                        System.out.println("No action planned for this Type: " + msg.getType());
                         break;
                 }
             }

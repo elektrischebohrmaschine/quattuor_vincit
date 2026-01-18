@@ -1,7 +1,9 @@
-package fhtw.quattuor.server;
+package fhtw.quattuor.testing;
 
 import fhtw.quattuor.common.model.GameSession;
 import fhtw.quattuor.common.model.Player;
+import fhtw.quattuor.server.ServerPlayerService;
+
 import java.util.ArrayList;
 import java.util.List;
 

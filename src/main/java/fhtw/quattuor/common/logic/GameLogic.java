@@ -40,7 +40,7 @@ public class GameLogic {
         gameSession.increaseMoveCount();
 
         // DEBUG - Remove later :)
-        gameSession.getBoard().print_board();
+        //gameSession.getBoard().print_board();
 
         return valid;
     }

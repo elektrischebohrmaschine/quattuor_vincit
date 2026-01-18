@@ -1,4 +1,4 @@
-package fhtw.quattuor.client;
+package fhtw.quattuor.testing;
 
 import fhtw.quattuor.common.model.GameSession;
 import fhtw.quattuor.common.model.Player;
