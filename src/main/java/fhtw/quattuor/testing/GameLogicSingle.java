@@ -1,5 +1,6 @@
-package fhtw.quattuor.common.logic;
+package fhtw.quattuor.testing;
 
+import fhtw.quattuor.common.logic.SingleLevels;
 import fhtw.quattuor.common.model.Board;
 import fhtw.quattuor.common.model.CellStatus;
 

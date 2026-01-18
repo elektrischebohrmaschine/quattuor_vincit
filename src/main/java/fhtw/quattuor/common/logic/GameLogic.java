@@ -29,7 +29,6 @@ public class GameLogic {
             return valid;
         }
 
-        // Set Cell depending on current player
         if (gameSession.getYourTurn()) {
             gameSession.getBoard().setCellStatus(x, y, CellStatus.PLAYER1);
         } else {

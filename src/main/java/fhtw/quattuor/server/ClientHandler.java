@@ -106,8 +106,6 @@ public class ClientHandler implements Runnable {
         return ServerMain.getPlayerService();
     }
 
-    // --- ab hier bleibt dein Code praktisch gleich, nur playerService -> playerService() und onlineUsers -> server.getOnlineUsers()
-
     private void handleSessionUpdateRequest(NetMessage msg) {
         if (loggedInPlayer == null) {
             sendError(NetType.NOT_LOGGED_IN, "Please LOGIN first");
@@ -238,8 +236,12 @@ public class ClientHandler implements Runnable {
         oppSession.setFinished(nowFinished);
 
         if (nowFinished && !wasFinished) {
-            if (outcome == 1) loggedInPlayer.increaseHighscore();
-            else if (outcome == 2) opponent.increaseHighscore();
+            if (outcome == 1) {
+                loggedInPlayer.increaseHighscore();
+            }
+            else if (outcome == 2) {
+                opponent.increaseHighscore();
+            }
         }
 
         opponent.updateGameSession(oppSession);

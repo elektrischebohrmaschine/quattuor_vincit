@@ -91,7 +91,6 @@ public class Player {
             }
         }
 
-        // Add GameSession to List if it does not exist yet
         gameSessions.add(session);
     }
 

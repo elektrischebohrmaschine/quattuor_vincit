@@ -61,7 +61,6 @@ public class ServerMain {
         clients.remove(clientHandler);
     }
 
-    // only for testing
     public void broadcast(String msg, ClientHandler from) {
         for (ClientHandler handler : clients) {
             if (handler != from) handler.send(msg);

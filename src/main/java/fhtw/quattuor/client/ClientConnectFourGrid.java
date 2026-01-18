@@ -1,7 +1,6 @@
 package fhtw.quattuor.client;
 
 import fhtw.quattuor.common.logic.GameLogic;
-import fhtw.quattuor.common.logic.GameLogicSingle;
 import fhtw.quattuor.common.logic.SingleLevels;
 import fhtw.quattuor.common.model.CellStatus;
 import fhtw.quattuor.common.model.GameSession;

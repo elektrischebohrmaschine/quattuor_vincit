@@ -42,7 +42,7 @@ public class GameSessionSerializer {
     }
 
     public List<GameSession> deserializeSessions(String jsonString) {
-        // Needed to make a type of "List of Players"
+        // Needed to make a type of "List of GameSessions"
         JavaType type = objectMapper.getTypeFactory()
                 .constructCollectionType(List.class, GameSession.class);
         try {
